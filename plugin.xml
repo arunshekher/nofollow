@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e107Plugin name="Nofollow" lan="NF_LAN_PLUGIN_NAME" version="1.0" date="2017-01-13" compatibility="2.0" installRequired="true" >
+	<author name="Arun" url="https://github.com/arunshekher" />
+	<summary lan="">An SEO and SPAM oriented plugin aimed to discourage backlink building SPAM in e107 powered websites.</summary>
+	<description lan="">This is an SEO and SPAM oriented plugin aimed to discourage backlink building SPAM in e107 powered websites by automatically inserting an rel=&#34;nofollow&#34; attribute to posted links in comment, chat, forum and other areas.Links with an rel=&#34;nofollow&#34; attribute generates no positive benefit for the poster in terms of PageRank (or other search engine value). </description>
+	<keywords>
+		<word>enhancement</word>
+		<word>nofollow</word>
+		<word>seo</word>
+	</keywords>
+	<category>tools</category>
+	<copyright></copyright>
+	<adminLinks>
+		<link url="admin_config.php" description="" icon="" iconSmall="" icon128="" primary="true" >LAN_CONFIGURE</link>
+	</adminLinks>
+	<pluginPrefs>
+		<pref name='Activate NoFollow?'>1</pref>
+		<pref name='Activate &#39;NoFollow Onpost&#39;?'>0</pref>
+		<pref name='Omit Pages: '></pref>
+		<pref name='Omit Domains:'>SITEBASEURL</pref>
+	</pluginPrefs>
+</e107Plugin>
