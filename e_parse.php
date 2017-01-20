@@ -26,7 +26,10 @@ class nofollow_parse
 	/* constructor */
 	function __construct()
 	{
-
+            if(e_ADMIN_AREA === true) 
+            { 
+                return; 
+            }
 
 	}
 
@@ -43,7 +46,7 @@ class nofollow_parse
             
             //$text = $this->makeNoFollow($text);
             
-            $text = $this->nf_searchReplace($text);
+            $text = $this->nofollow_toHtml($text);
             return $text;
 	}
         
@@ -51,14 +54,19 @@ class nofollow_parse
         
         /**
 	 * Adds rel="nofollow" attribute to html anchor tags if not present.
-	 * If already have an rel attr. but no nofollow, appends nofollow attribute. 
-	 * inserts rel="nofollow" for everything else.
+	 * If already have an rel attr. but no nofollow value, appends nofollow. 
+	 * Inserts rel="nofollow" for everything else passed to it.
 	 * 
 	 * @param str $anchor - string with opening anchor tag that is passed in
 	 * @return str - The modified opening anchor tag string
-	 * @access private
+	 * @access protected
+         * 
+         * @todo Add another conditional which will look for rel="external" 
+         * in anchor tag and replace with rel="external nofollow" target="_blank" 
+         * because appending nofollow to an rel attribute with external vaue will 
+         * break e107's JS way of making the link open in new window
 	 */
-	protected function makeNoFollow($anchor)
+	protected function stamp_NoFollow($anchor)
 	{
 		if( strpos( $anchor, 'nofollow' ) )
 		{ 
@@ -80,10 +88,11 @@ class nofollow_parse
 	}	
 	
 	/**
-	 * Scans through $text for anchor tags after spliting up by html tags
+	 * Split up $text by html tags scans for anchor tags and apply 
+         * nofollow to suitable anchor tag candidates
 	 * (adopted from linkwords plugin.)
 	 * 
-	 * @param str $text - The anchor string that will be altered
+	 * @param str $text - text string that will be altered
 	 * @param str $opts['context'] - default context
 	 * @param bool $logflag - switch to log the makenofollow on post
          * @return string Modified text
@@ -93,7 +102,7 @@ class nofollow_parse
        
           
           
-          public function nf_searchReplace(&$text) 
+          public function nofollow_toHtml(&$text) 
           {
               
               $nf_text = '';
@@ -105,7 +114,7 @@ class nofollow_parse
               {
                   if ( strpos( $fragment, '<a' ) !== false && !strpos( $fragment, '<a' ) )
                   {
-                      $nf_text .= $this->makeNoFollow($fragment);
+                      $nf_text .= $this->stamp_NoFollow($fragment);
                   }
                   else
                   {
