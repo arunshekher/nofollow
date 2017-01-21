@@ -102,7 +102,7 @@ class nofollow_parse
        
           
           
-          public function nofollow_toHtml(&$text) 
+          public function nofollow_toHtml($text) 
           {
               
               $nf_text = '';
