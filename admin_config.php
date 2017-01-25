@@ -9,7 +9,7 @@ if (!getperms('P'))
 	exit;
 }
 
-// e107::lan('nofollow',true);
+e107::lan('nofollow', 'admin', true);
 
 
 class nofollow_adminArea extends e_admin_dispatcher
@@ -18,10 +18,10 @@ class nofollow_adminArea extends e_admin_dispatcher
 	protected $modes = array(	
 	
 		'main'	=> array(
-			'controller' 	=> 'nofollow_ui',
-			'path' 		=> null,
-			'ui' 		=> 'nofollow_form_ui',
-			'uipath' 	=> null
+			'controller' => 'nofollow_ui',
+			'path' => null,
+			'ui' => 'nofollow_form_ui',
+			'uipath' => null
 		),
 		
 
@@ -30,16 +30,16 @@ class nofollow_adminArea extends e_admin_dispatcher
 	
 	protected $adminMenu = array(
 			
-		'main/prefs' 		=> array('caption'=> LAN_PREFS, 'perm' => 'P'),	
-
-		// 'main/custom'		=> array('caption'=> 'Custom Page', 'perm' => 'P')
+		'main/prefs' => array('caption'=> LAN_PREFS, 'perm' => 'P'),	
+		//'main/custom' => array('caption'=> 'Custom Page', 'perm' => 'P')
+		
 	);
 
 	protected $adminMenuAliases = array(
 		'main/edit'	=> 'main/list'				
 	);	
 	
-	protected $menuTitle = 'Nofollow';
+	protected $menuTitle = LAN_NOFOLLOW_PLUGIN_TITLE;
 }
 
 
@@ -49,33 +49,46 @@ class nofollow_adminArea extends e_admin_dispatcher
 class nofollow_ui extends e_admin_ui
 {
 			
-		protected $pluginTitle		= 'Nofollow';
-		protected $pluginName		= 'nofollow';
-	//	protected $eventName		= 'nofollow-'; // remove comment to enable event triggers in admin. 		
-		protected $table			= '';
-		protected $pid				= '';
-		protected $perPage			= 10; 
-		protected $batchDelete		= true;
-	//	protected $batchCopy		= true;		
-	//	protected $sortField		= 'somefield_order';
-	//	protected $orderStep		= 10;
-	//	protected $tabs				= array('Tabl 1','Tab 2'); // Use 'tab'=>0  OR 'tab'=>1 in the $fields below to enable. 
-		
-	//	protected $listQry      	= "SELECT * FROM `#tableName` WHERE field != '' "; // Example Custom Query. LEFT JOINS allowed. Should be without any Order or Limit.
-	
-		protected $listOrder		= ' DESC';
-	
-		protected $fields 		= NULL;		
+		protected $pluginTitle = LAN_NOFOLLOW_PLUGIN_TITLE;
+		protected $pluginName = LAN_NOFOLLOW_PLUGIN_NAME;
+		//protected $eventName = 'nofollow-'; // remove comment to enable event triggers in admin. 		
+			
 		
 		protected $fieldpref = array();
 		
 
-	//	protected $preftabs        = array('General', 'Other' );
+		//	protected $preftabs = array('General', 'Other' );
+		
 		protected $prefs = array(
-			'Activate NoFollow?'		=> array('title'=> 'Activate NoFollow?', 'tab'=>0, 'type'=>'boolean', 'data' => 'str', 'help'=>'Turn Nofollow on or off.'),
-			'Activate &#39;NoFollow Onpost&#39;?'		=> array('title'=> 'Activate &#39;NoFollow Onpost&#39;?', 'tab'=>0, 'type'=>'boolean', 'data' => 'str', 'help'=>'Activate conversion of anchor tags with rel=&#39;nofollow&#39; while user makes posts.'),
-			'Omit Pages: '		=> array('title'=> 'Omit Pages: ', 'tab'=>0, 'type'=>'textarea', 'data' => 'str', 'help'=>'Same format as menu visibility control. One match per line. Specify a partial or'),
-			'Omit Domains:'		=> array('title'=> 'Omit Domains:', 'tab'=>0, 'type'=>'textarea', 'data' => 'str', 'help'=>'List of domains which you don&#39;t want to pass through the nofollow filter or the '),
+			'globally_on' => array(
+				'title'=> 'Activate NoFollow?', 
+				'tab'=> 0, 
+				'type'=>'boolean', 
+				'data' => 'str', 
+				'help'=>'Turn Nofollow on or off.'
+				),
+				
+			'onpost_on' => array(
+				'title'=> 'Activate &#39;NoFollow Onpost&#39;?', 
+				'tab'=> 0, 
+				'type'=>'boolean', 
+				'data' => 'str', 
+				'help'=>'Activate conversion of anchor tags with rel=&#39;nofollow&#39; while user makes posts.'
+				),
+			'ignore_pages' => array(
+				'title'=> 'Omit Pages: ', 
+				'tab'=> 0, 
+				'type'=>'textarea', 
+				'data' => 'str', 
+				'help'=>'Same format as menu visibility control. One match per line. Specify a partial or'
+				),
+			'ignore_domains' => array(
+				'title'=> 'Omit Domains:', 
+				'tab'=> 0, 
+				'type'=>'textarea', 
+				'data' => 'str', 
+				'help'=>'List of domains which you don&#39;t want to pass through the nofollow filter'
+				),
 		); 
 
 	
