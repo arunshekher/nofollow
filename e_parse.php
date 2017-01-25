@@ -52,7 +52,7 @@ class nofollow_parse
         
         
         
-        /**
+    /**
 	 * Adds rel="nofollow" attribute to html anchor tags if not present.
 	 * If already have an rel attr. but no nofollow value, appends nofollow. 
 	 * Inserts rel="nofollow" for everything else passed to it.
@@ -76,7 +76,8 @@ class nofollow_parse
 		if( strpos( $anchor, 'rel' ) )
 		{
 			$pattern = "/rel=([\"'])([^\\1]+?)\\1/";
-			$replace = "rel=\\1\\2 nofollow\\1";			
+			//$replace = "rel=\\1\\2 nofollow\\1";
+			$replace = "rel=\\1\\2 nofollow\\1 target=\"_blank\"";// <-- this works but have to confirm how accurate it is.			
 			return preg_replace($pattern, $replace, $anchor);
 		} 
 		else 
@@ -89,13 +90,13 @@ class nofollow_parse
 	
 	/**
 	 * Split up $text by html tags scans for anchor tags and apply 
-         * nofollow to suitable anchor tag candidates
+     * nofollow to suitable anchor tag candidates
 	 * (adopted from linkwords plugin.)
 	 * 
 	 * @param str $text - text string that will be altered
 	 * @param str $opts['context'] - default context
 	 * @param bool $logflag - switch to log the makenofollow on post
-         * @return string Modified text
+	 * @return string Modified text
 	 * @access public
 	 * @todo fix omit based on contexts
 	 */
