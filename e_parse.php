@@ -23,7 +23,7 @@ class nofollow_parse
 {
     
     
-        private static $_nofollow_Prefs = array();
+        private static $_Prefs = array();
         private static $_Active = false;
         private $_nofollow_ignoreDomains = array();
         private $_nofollow_ignorePages = array();
@@ -50,7 +50,7 @@ class nofollow_parse
          */
         protected static function Prefs()
         {
-            self::$_nofollow_Prefs = e107::getPlugPref('nofollow');
+            self::$_Prefs = e107::getPlugPref('nofollow');
         }
         
         
@@ -60,9 +60,9 @@ class nofollow_parse
          */
         protected static function Status()
         {
-            if ( count(self::$_nofollow_Prefs ) )
+            if ( count(self::$_Prefs ) )
             {
-                self::$_Active = self::$_nofollow_Prefs['globally_on'];
+                self::$_Active = self::$_Prefs['globally_on'];
             }
             else
             {
