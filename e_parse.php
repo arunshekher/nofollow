@@ -24,7 +24,7 @@ class nofollow_parse
     
     
         private static $_nofollow_Prefs = array();
-        private static $_nofollow_Active = false;
+        private static $_Active = false;
         private $_nofollow_ignoreDomains = array();
         private $_nofollow_ignorePages = array();
 
@@ -62,11 +62,11 @@ class nofollow_parse
         {
             if ( count(self::$_nofollow_Prefs ) )
             {
-                self::$_nofollow_Active = self::$_nofollow_Prefs['globally_on'];
+                self::$_Active = self::$_nofollow_Prefs['globally_on'];
             }
             else
             {
-                self::$_nofollow_Active = false;
+                self::$_Active = false;
             }
         }
 
@@ -80,10 +80,12 @@ class nofollow_parse
             //require_once e_HANDLER.'benchmark.php';
             //$bench = new e_benchmark();
             //$bench->start();
-            
-            $text = $this->nofollow_toHtml($text);
-            
-            //$text = $this->nofollow_toHtml_DOM( $text );
+            if ( self::$_Active )
+            {
+                $text = $this->nofollow_toHtml($text);
+                //$text = $this->nofollow_toHtml_DOM( $text );
+                return $text;
+            }
             
             //$bench->end()->logResult('Nofollow_DOM_Method-1');
             //$bench->end()->logResult('Nofollow_REGEX_Method-1');
