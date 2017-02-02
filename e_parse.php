@@ -290,7 +290,7 @@ class nofollow_parse
             {
                 if ( strpos( $fragment, '<a' ) !== false && ! strpos( $fragment, '<a' ) )
                 { 
-                    if ( ! self::_excludeDomain( $fragment ) ) //@TODO simplify this double negation
+                    if ( ! self::_excludeDomain( $fragment ) ) //@TODO simplify this double negation and too many nesting
                     {
                         $nf_text .= self::stamp_NoFollow( $fragment );
                     }
@@ -309,7 +309,20 @@ class nofollow_parse
         }
           
           
-          
+        
+        /**
+         * Boilerplate Sub-method to breadapart the above method logic for simplicity 
+         * and maintainalbility the code and add the operational conditional checks
+         * 
+         * @param string $anchor
+         * @return string
+         * @todo develop the method, do the _exclude() domain and internal link checks here
+         */
+        protected function processAnchor( $anchor )
+        {
+            return $processed;
+        }
+        
         /**
          * Experimental alternative method to add nofollow using PHP DOM Parser
          * Has slight temporal edge over the REGEX method when benchmarked with e107 
