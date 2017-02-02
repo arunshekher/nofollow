@@ -22,77 +22,208 @@ if (!defined('e107_INIT')) { exit; }
 class nofollow_parse
 {
     
-    
+        /**
+         * Plugin preferences
+         * @var array 
+         */
         private static $_Prefs = array();
+        /**
+         * Plugin operative status
+         * @var boolean 
+         */
         private static $_Active = false;
-        private $_nofollow_ignoreDomains = array();
-        private $_nofollow_ignorePages = array();
+        /**
+         * Exclude/ignore domains
+         * @var array 
+         */
+        private static $_excludeDomains = array();
+        /**
+         * Exclude/ignore pages
+         * @var array 
+         */
+        private static $_excludePages = array();
+        
+        const HOST_SITE = SITEURLBASE;
 
 
         /* constructor */
 	function __construct()
 	{
-            // admin area doesnt require nofollow service
+            // admin area doesn't require nofollow service
             if(e_ADMIN_AREA === true) 
             { 
                 return; 
             }
-            // set prefs
-            self::Prefs();
-            // set status
-            self::Status();
-        }
-        
-        
-        /**
-         * Pref Setter - Retrieve and set plugin preferences
-         * 
-         */
-        protected static function Prefs()
-        {
-            self::$_Prefs = e107::getPlugPref('nofollow');
-        }
-        
-        
-        /**
-         * Status Setter - set plugin status
-         * 
-         */
-        protected static function Status()
-        {
-            if ( count(self::$_Prefs ) )
+            
+            // let's start - set plugin prefs
+            self::$_Prefs = self::_getPrefs();
+            // - set status
+            self::$_Active = self::_getStatus();
+            // - set exclude pages
+            self::$_excludePages = self::_getExcludePages();
+            // - set exclude domains
+            self::$_excludeDomains = self::_getExcludeDomains();
+            
+            // if an exclude page - return
+            if ( self::_excludePage() )
             {
-                self::$_Active = self::$_Prefs['globally_on'];
-            }
-            else
-            {
-                self::$_Active = false;
+                return;
             }
         }
-
+        
+        
         /**
+         * Retrieve and return plugin preferences
+         * @access protected
+         * @return array associative array of plugin preferences
+         */
+        protected static function _getPrefs()
+        {
+            return e107::getPlugPref('nofollow');
+        }
+        
+        
+        /**
+         * Get plugin operation status from plugin prefs
+         * @return integer|boolean
+         */
+        protected static function _getStatus()
+        {
+            if ( is_array( self::$_Prefs ) && isset( self::$_Prefs['globally_on'] ) )
+            {
+                return self::$_Prefs['globally_on'];
+            }
+            
+            return false;
+            
+        }
+        
+        /**
+         * Get exclude pages as an array
+         * @return array
+         */
+        protected static function _getExcludePages()
+        {
+            return explode( "\n", self::$_Prefs['ignore_pages'] );
+        }
+        
+        /**
+         * Get exclude pages as an array
+         * @return type
+         */
+        protected static function _getExcludeDomains()
+        {
+            if ( is_array( self::$_Prefs ) && isset( self::$_Prefs['ignore_domains'] ) )
+            {
+                return self::nl_string_toArray( self::$_Prefs['ignore_domains'] );
+            }
+            
+            return e_DOMAIN;
+        }
+        
+        
+        /**
+         * Helper method
+         * @param type $str_with_nl
+         * @return type
+         */
+        protected static function nl_string_toArray( $str_with_nl )
+        {
+            $str = str_replace( ["\r\n", "\n\r"], "|", $str_with_nl );
+            $array = explode( "|", $str );
+            return array_unique( $array );
+        }
+        
+        
+        /**
+         * Check if present page is a strpos of exclude page
+         * @todo preferably need a foreach loop to loop through all the listed exclude pages
+         * @return boolean
+         */
+        protected static function _excludePage()
+        {
+            $present_page = e_REQUEST_URI;
+            
+            $exclude_pages = "";
+            
+            if ( strpos( $present_page, $exclude_pages ) !== false )
+            {
+                return true;
+            }
+        }
+        
+        /**
+         * Check if the anchor tag URL is an excluded domain
+         * @param string $anchor
+         * @return boolean
+         * @todo add foreach loop to iterate through all exclude domains when have multiple
+         */
+        protected static function _excludeDomain( $anchor )
+        {
+            $excludes = 'physioblasts.org';// <-- test implementation
+            if ( strpos( self::_getHrefValue( $anchor ), $excludes ) !== false )
+            {
+                return true;
+            }
+            return false;
+        }
+        
+        /**
+         * Get the href attribute value of anchor tag
+         * @param string $anchor
+         * @return string Href value | ***empty***
+         */
+        protected static function _getHrefValue( $anchor )
+        {
+            preg_match('~<a (?>[^>h]++|\Bh|h(?!ref\b))*href\s*=\s*["\']?\K[^"\'>\s]++~i', $anchor, $matches);
+            
+            if ( ! empty($matches) )
+            {
+                return $matches[0];
+            }
+            return "***empty***";
+        }
+        
+        
+        /**
+         * @psuedocode 
+         * A combined method for checking excluded domains and internal links
+         * Method name: 'needNofollow' 'requireNofollow' or something similar
+         */
+        // Get the anchor tag fragment
+        //      IF has href value
+        //              IF has a base domain in Href value
+        //                  IF the domain is listed in exclude list 
+        //                      RETURN true
+        //                  ELSE
+        //                      RETURN false
+        //              ELSE
+        //                  RETURN true
+        //     ELSE RETURN false
+        
+        /**
+         * @access public
 	 * @param string $text html/text to be processed.
 	 * @param string $context Current context ie.  OLDDEFAULT | BODY | TITLE | SUMMARY | DESCRIPTION | WYSIWYG etc.
 	 * @return string
 	 */
-	function toHtml($text, $context='')
+	public function toHtml( $text, $context='' )
 	{
             //require_once e_HANDLER.'benchmark.php';
             //$bench = new e_benchmark();
             //$bench->start();
             if ( self::$_Active )
             {
-                $text = $this->nofollow_toHtml($text);
-                //$text = $this->nofollow_toHtml_DOM( $text );
+                $text = self::nofollow_toHtml( $text );
+                //$text = self::nofollow_toHtml_DOM( $text );
+
                 return $text;
             }
-            
+
             //$bench->end()->logResult('Nofollow_DOM_Method-1');
             //$bench->end()->logResult('Nofollow_REGEX_Method-1');
             //$bench->end();
             //$bench->printResult();
-            // Debug
-            //print_a(self::$_nofollow_Active);
             return $text;
 	}
         
@@ -113,128 +244,150 @@ class nofollow_parse
          * break e107's JS way of making the link open in new window
          * @todo may be refactor the name to 'insert_Nofollow' or 'add_Nofollow'
 	 */
-	protected function stamp_NoFollow($anchor)
+	protected static function stamp_NoFollow( $anchor )
 	{
-		if( strpos( $anchor, 'nofollow' ) )
-		{ 
-			return $anchor; 
-		}
-		
-		if( strpos( $anchor, 'rel' ) )
-		{
-			$pattern = "/rel=([\"'])([^\\1]+?)\\1/";
-			//$replace = "rel=\\1\\2 nofollow\\1";
-			$replace = "rel=\\1\\2 nofollow\\1 target=\"_blank\"";// <-- this works but have to confirm how accurate it is.			
-			return preg_replace($pattern, $replace, $anchor);
-		} 
-		else 
-		{
-			$pattern = "/<a /";
-			$replace = "<a rel=\"nofollow\" ";
-			return preg_replace($pattern, $replace, $anchor);
-		}
+            if( strpos( $anchor, 'nofollow' ) )
+            { 
+                    return $anchor; 
+            }
+
+            if( strpos( $anchor, 'rel' ) )
+            {
+                    $pattern = "/rel=([\"'])([^\\1]+?)\\1/";
+                    //$replace = "rel=\\1\\2 nofollow\\1";
+                    $replace = "rel=\\1\\2 nofollow\\1 target=\"_blank\"";// <-- this works but have to confirm how accurate it is.			
+                    return preg_replace($pattern, $replace, $anchor);
+            } 
+            else 
+            {
+                    $pattern = "/<a /";
+                    $replace = "<a rel=\"nofollow\" ";
+                    return preg_replace($pattern, $replace, $anchor);
+            }
 	}	
 	
-	/**
-	 * Split up $text by html tags scans for anchor tags and apply 
-         * nofollow to suitable anchor tag candidates
-	 * (adopted from linkwords plugin.)
-	 * 
-	 * @param str $text - text string that will be altered
-	 * @param str $opts['context'] - default context
-	 * @param bool $logflag - switch to log the makenofollow on post
-	 * @return string Modified text
-	 * @access public
-	 * @todo fix omit based on contexts
-	 */
-       
-          
-          
-          public function nofollow_toHtml($text) 
-          {
-              
-              $nf_text = '';
-              
-              $pattern = '#(<.*?>)#mis';
-              $fragments = preg_split($pattern, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-              
-              foreach ($fragments as $fragment ) 
-              {
-                  if ( strpos( $fragment, '<a' ) !== false && !strpos( $fragment, '<a' ) )
-                  {
-                      $nf_text .= $this->stamp_NoFollow($fragment);
-                  }
-                  else
-                  {
-                      $nf_text .= $fragment;
-                  }
-              }
-              return $nf_text;
-          }
-          
-          
-          
-          /**
-           * Alternative method to add nofollow using PHP HTML DOM Parser
-           * Has slight temporal edge over the REGEX method when tested with e107 benchmark class
-           * 
-           * @todo Have a known consequence of adding some unprintable space 
-           * character or something that mess up bootstrap styling little bit, 
-           * to be precise causing the caret sign to drop to a new line in some anchor tags.
-           * Update: Found out that its(probably the foreach loop which iterates anchor tags) 
-           * stripping 'style' attribute values from anchor tags.
-           * 
-           * @param type $text
-           * @return type
-           */
-          protected function nofollow_toHtml_DOM( $text )
-          {
-                $dom = new DOMDocument;
- 
-                $dom->loadHTML( $text );
+        /**
+         * Split up $text by html tags and inner text scans for anchor tags and apply 
+         * nofollow to 'suitable' anchor tag candidates
+         * (adopted from linkwords plugin.)
+         * 
+         * @param str $text - text string that will be altered
+         * @param str $opts['context'] - default context
+         * @param bool $logflag - switch to log the makenofollow on post
+         * @return string Modified text
+         * @access protected
+         * @todo fix omit based on contexts
+         */
+        protected static function nofollow_toHtml( $text ) 
+        {
 
-                $anchors = $dom->getElementsByTagName( 'a' );
+            $nf_text = '';
 
-                foreach( $anchors as $anchor )
+            $pattern = '#(<.*?>)#mis';
+            $fragments = preg_split( $pattern, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE );
+
+            foreach ( $fragments as $fragment ) 
+            {
+                if ( strpos( $fragment, '<a' ) !== false && ! strpos( $fragment, '<a' ) )
                 { 
-                    $rel = array(); 
-
-                    if ( $anchor->hasAttribute( 'rel' ) AND ( $relAtt = $anchor->getAttribute( 'rel' ) ) !== '' )
+                    if ( ! self::_excludeDomain( $fragment ) ) //@TODO simplify this double negation
                     {
-                       $rel = preg_split( '/\s+/', trim($relAtt) );
+                        $nf_text .= self::stamp_NoFollow( $fragment );
                     }
-
-                    if ( in_array( 'nofollow', $rel ) )
+                    else
                     {
-                      continue;
+                        $nf_text .= $fragment;
                     }
                     
-                    if ( in_array( 'external', $rel ) )
-                    {
-                        $anchor->setAttribute( 'target', '_blank');
-                    }
-
-                    $rel[] = 'nofollow';
-                    $anchor->setAttribute( 'rel', implode( ' ', $rel ) );
                 }
-
-                $dom->saveHTML();
-
-                $html = '';
-
-                foreach( $dom->getElementsByTagName( 'body' )->item( 0 )->childNodes as $element ) {
-                    $html .= $dom->saveXML( $element, LIBXML_NOEMPTYTAG );
+                else
+                {
+                    $nf_text .= $fragment;
                 }
-
-                return $html;      
-          }
+            }
+            return $nf_text;
+        }
           
           
-          protected static function goodDomain( $domain )
-          {
-              
-          }
+          
+        /**
+         * Experimental alternative method to add nofollow using PHP DOM Parser
+         * Has slight temporal edge over the REGEX method when benchmarked with e107 
+         * benchmark class.
+         * 
+         * @todo Have a known consequence of adding some unprintable space 
+         * character or something that mess up bootstrap styling little bit, 
+         * to be precise causing the caret sign to drop to a new line in some 
+         * anchor tags.
+         * 
+         * Update: Found out that its(probably the logic inside foreach loop which 
+         * iterates anchor tags) stripping 'style' attribute values from anchor tags.
+         * 
+         * Update: Not stripping of style tag, it's a <p tag that it adds around 
+         * anchor text which breaks botstrap layout 
+         * 
+         * @param string $text
+         * @return string
+         */
+        protected static function nofollow_toHtml_DOM( $text )
+        {
+            $dom = new DOMDocument;
 
+            $dom->loadHTML( $text );
+
+            $anchors = $dom->getElementsByTagName( 'a' );
+
+            foreach( $anchors as $anchor )
+            { 
+                $rel = array(); 
+                
+                if ( $anchor->hasAttribute( 'rel' ) AND ( $relAtt = $anchor->getAttribute( 'rel' ) ) !== '' )
+                {
+                    //$rel = preg_split( '/\s+/', trim($relAtt) );
+                    //$rel = str_replace( " ", ".", trim( $relAtt ) );
+                    //$rel = array_unique( explode( ".", $rel ) );
+                    $rel = array_unique( explode( " ", trim( $relAtt ) ) );
+                }
+
+                if ( in_array( 'nofollow', $rel ) )
+                {
+                  continue;
+                }
+
+                if ( in_array( 'external', $rel ) )
+                {
+                    $anchor->setAttribute( 'target', '_blank');
+                }
+
+                $rel[] = 'nofollow';
+                
+                $anchor->setAttribute( 'rel', implode( ' ', $rel ) );
+            }
+
+            $dom->saveHTML();
+
+            $html = '';
+
+            foreach( $dom->getElementsByTagName( 'body' )->item( 0 )->childNodes as $element ) {
+                $html .= $dom->saveXML( $element, LIBXML_NOEMPTYTAG );
+                //$html .= $dom->saveXML( $element, LIBXML_HTML_NOIMPLIED );
+                //$html .= $dom->saveHTML( $element );
+            }
+
+            return $html;      
+        }
+          
+        
+        /**
+         * Debug logger
+         * @param string $content String content that's being passed in as arguement
+         * @param string $logname Optional log file name
+         */
+        private static function _debugLog($content, $logname = 'NOFOLLOW-DEBUG') {
+            $path = e_PLUGIN.'nofollow/'.$logname.'.log';
+            file_put_contents($path, $content."\n", FILE_APPEND);
+            unset($path, $content);
+        }
 
 
 }
