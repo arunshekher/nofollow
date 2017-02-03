@@ -23,12 +23,12 @@ class nofollow_parse
 {
     
         /**
-         * Plugin preferences
+         * Plugin Preferences
          * @var array 
          */
         private static $_Prefs = array();
         /**
-         * Plugin operative status
+         * Operative status
          * @var boolean 
          */
         private static $_Active = false;
@@ -49,7 +49,7 @@ class nofollow_parse
         /* constructor */
 	function __construct()
 	{
-            // admin area doesn't require nofollow service
+            // if admin area - return
             if(e_ADMIN_AREA === true) 
             { 
                 return; 
@@ -311,15 +311,19 @@ class nofollow_parse
           
         
         /**
-         * Boilerplate Sub-method to breadapart the above method logic for simplicity 
-         * and maintainalbility the code and add the operational conditional checks
+         * Boilerplate Sub-method to break-apart the above method logic for simplicity 
+         * and maintainalbility and add the operational conditional checks of plugin
          * 
          * @param string $anchor
          * @return string
-         * @todo develop the method, do the _exclude() domain and internal link checks here
+         * @todo develop the method, do the _excludeDomain() and internal link checks here
          */
         protected function processAnchor( $anchor )
         {
+            // IF _excludeDomain() OR internalLink()
+            //      RETURN $anchor
+            // ELSE
+            //      RETURN stamp_Nofollow( $anchor );
             return $processed;
         }
         
