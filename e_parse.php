@@ -28,7 +28,7 @@ class nofollow_parse
          */
         private static $_Prefs = array();
         /**
-         * Operative status
+         * Operational status
          * @var boolean 
          */
         private static $_Active = false;
@@ -42,8 +42,13 @@ class nofollow_parse
          * @var array 
          */
         private static $_excludePages = array();
-        
-        const HOST_SITE = SITEURLBASE;
+        /**
+         * Parsing method used
+         * @var type 
+         */
+        private static $_parseMethod = null;
+
+                const HOST_SITE = SITEURLBASE;
 
 
         /* constructor */
@@ -55,7 +60,7 @@ class nofollow_parse
                 return; 
             }
             
-            // let's start - set plugin prefs
+            // Begin - set plugin prefs
             self::$_Prefs = self::_getPrefs();
             // - set status
             self::$_Active = self::_getStatus();
@@ -63,8 +68,10 @@ class nofollow_parse
             self::$_excludePages = self::_getExcludePages();
             // - set exclude domains
             self::$_excludeDomains = self::_getExcludeDomains();
+            // - set parse method
+            self::$_parseMethod = self::_getParseMethod();
             
-            // if an exclude page - return
+            // If an exclude page - return
             if ( self::_excludePage() )
             {
                 return;
@@ -84,7 +91,7 @@ class nofollow_parse
         
         
         /**
-         * Get plugin operation status from plugin prefs
+         * Get plugin operational status flag
          * @return integer|boolean
          */
         protected static function _getStatus()
@@ -99,7 +106,7 @@ class nofollow_parse
         }
         
         /**
-         * Get exclude pages as an array
+         * Get exclude pages as a numeric array
          * @return array
          */
         protected static function _getExcludePages()
@@ -108,7 +115,7 @@ class nofollow_parse
         }
         
         /**
-         * Get exclude pages as an array
+         * Get exclude pages as a numeric array
          * @return type
          */
         protected static function _getExcludeDomains()
@@ -121,11 +128,20 @@ class nofollow_parse
             return e_DOMAIN;
         }
         
+        /**
+         * Get parse method preference
+         * @return type
+         */
+        protected static function _getParseMethod()
+        {
+            return trim( e107::getPlugPref( 'nofollow', 'parse_method', 'regexHtmlParse_Nofollow' ) );
+        }
+        
         
         /**
-         * Helper method
+         * Helper method - Convert newline delimited string to numeric array
          * @param type $str_with_nl
-         * @return type
+         * @return array
          */
         protected static function nl_string_toArray( $str_with_nl )
         {
@@ -177,7 +193,7 @@ class nofollow_parse
         {
             preg_match('~<a (?>[^>h]++|\Bh|h(?!ref\b))*href\s*=\s*["\']?\K[^"\'>\s]++~i', $anchor, $matches);
             
-            if ( ! empty($matches) )
+            if ( ! empty( $matches ) )
             {
                 return $matches[0];
             }
@@ -209,21 +225,25 @@ class nofollow_parse
 	 */
 	public function toHtml( $text, $context='' )
 	{
-            //require_once e_HANDLER.'benchmark.php';
-            //$bench = new e_benchmark();
-            //$bench->start();
+            //@test: calling method with 'name'
+            $method = self::$_parseMethod;
+            
             if ( self::$_Active )
             {
-                $text = self::nofollow_toHtml( $text );
-                //$text = self::nofollow_toHtml_DOM( $text );
-
+                //require_once e_HANDLER.'benchmark.php';
+                //$bench = new e_benchmark();
+                //$bench->start();
+                
+                $text = self::$method( $text );
+                
+                //$testMethod = 'Nofollow-SimpleDOM-Method-' . time();
+                //$bench->end()->logResult( $testMethod );
+                
                 return $text;
             }
-
-            //$bench->end()->logResult('Nofollow_DOM_Method-1');
-            //$bench->end()->logResult('Nofollow_REGEX_Method-1');
-            //$bench->end();
-            //$bench->printResult();
+            
+            
+            
             return $text;
 	}
         
@@ -278,7 +298,7 @@ class nofollow_parse
          * @access protected
          * @todo fix omit based on contexts
          */
-        protected static function nofollow_toHtml( $text ) 
+        protected static function regexHtmlParse_Nofollow( $text ) 
         {
 
             $nf_text = '';
@@ -346,7 +366,7 @@ class nofollow_parse
          * @param string $text
          * @return string
          */
-        protected static function nofollow_toHtml_DOM( $text )
+        protected static function htmlDomParse_Nofollow( $text )
         {
             $dom = new DOMDocument;
 
@@ -395,12 +415,50 @@ class nofollow_parse
         }
           
         
+        
+        /**
+         * Nofollow DOM parser using simple_html_dom.php library
+         * @todo This is a test implementation, implement it properly 
+         * - check for rel='external' in anchor and add target='_blank' in 
+         * those cases like the regex method. Also try to move the 
+         * simple_html_dom.php to e_library.php after studying how exactly 
+         * it works
+         * 
+         * @param string - $text
+         * @return string - Parsed $text
+         */
+        protected static function simpleHtmlDomParse_Nofollow( $text )
+        {
+            require_once( 'lib/simple_html_dom.php' );
+            
+            $dom = new simple_html_dom;
+            
+            $dom->load($text);
+            
+            $anchors = $dom->find('a');
+            
+            foreach ( $anchors as $anchor )
+            {
+                if ( $anchor->rel == 'nofollow' )
+                {
+                    continue;
+                }
+                else
+                {
+                    $anchor->rel = 'nofollow';
+                }
+            }
+            
+            return $dom->save();
+        }
+        
+        
         /**
          * Debug logger
          * @param string $content String content that's being passed in as arguement
          * @param string $logname Optional log file name
          */
-        private static function _debugLog($content, $logname = 'NOFOLLOW-DEBUG') {
+        private static function _debugLog($content, $logname = 'Nofollow-Debug') {
             $path = e_PLUGIN.'nofollow/'.$logname.'.log';
             file_put_contents($path, $content."\n", FILE_APPEND);
             unset($path, $content);

@@ -48,103 +48,139 @@ class nofollow_adminArea extends e_admin_dispatcher
 				
 class nofollow_ui extends e_admin_ui
 {
-			
-		protected $pluginTitle = LAN_NOFOLLOW_PLUGIN_TITLE;
-		protected $pluginName = LAN_NOFOLLOW_PLUGIN_NAME;
-		//protected $eventName = 'nofollow-'; // remove comment to enable event triggers in admin. 		
-			
-		
-		protected $fieldpref = array();
-		
+        /**
+         *
+         * @var type 
+         */	
+        protected $pluginTitle = LAN_NOFOLLOW_PLUGIN_TITLE;
 
-		//	protected $preftabs = array('General', 'Other' );
-		
-		protected $prefs = array(
-			'globally_on' => array(
-				'title'=> 'Activate NoFollow?', 
-				'tab'=> 0, 
-				'type'=>'boolean', 
-				'data' => 'str', 
-				'help'=>'Turn Nofollow on or off.'
-				),
-				
-			'onpost_on' => array(
-				'title'=> 'Activate &#39;NoFollow Onpost&#39;?', 
-				'tab'=> 0, 
-				'type'=>'boolean', 
-				'data' => 'str', 
-				'help'=>'Activate conversion of anchor tags with rel=&#39;nofollow&#39; while user makes posts.'
-				),
-			'ignore_pages' => array(
-				'title'=> 'Omit Pages: ', 
-				'tab'=> 0, 
-				'type'=>'textarea', 
-				'data' => 'str', 
-				'help'=>'Same format as menu visibility control. One match per line. Specify a partial or'
-				),
-			'ignore_domains' => array(
-				'title'=> 'Omit Domains:', 
-				'tab'=> 0, 
-				'type'=>'textarea', 
-				'data' => 'str', 
-				'help'=>'List of domains which you don&#39;t want to pass through the nofollow filter'
-				),
-		); 
+        /**
+         *
+         * @var type 
+         */
+        protected $pluginName = 'nofollow';
 
-	
-		public function init()
-		{
-			// Set drop-down values (if any). 
-	
-		}
+        /**
+         *
+         * @var type 
+         */
+        protected $parseMethods = array(
+                    'regexHtmlParse_Nofollow' => LAN_NOFOLLOW_REGEX_PARSER, 
+                    'simpleHtmlDomParse_Nofollow' => LAN_NOFOLLOW_SIMPLE_HTML_DOM_PARSER
+                    );
+
+        /**
+         *
+         * @var type 
+         */
+        protected $fieldpref = array();
+
+        /**
+         * 
+         */
+        //protected $preftabs = array('General', 'Other' );
+
+        /**
+         * Plugin preferences
+         * @var type 
+         */
+        protected $prefs = array(
+
+                'globally_on' => array( //@TODO Rename to operative_status/in_action or something similar
+                        'title'=> LAN_NOFOLLOW_ACTIVATE, 
+                        'tab'=> 0, 
+                        'type'=>'boolean', 
+                        'data' => 'str', 
+                        'help' => LAN_NOFOLLOW_HINT_ACTIVATE
+                        ),
+
+                'onpost_on' => array(
+                        'title'=> LAN_NOFOLLOW_ONPOST_ACTIVATE, 
+                        'tab'=> 0, 
+                        'type'=>'boolean', 
+                        'data' => 'str', 
+                        'help' => LAN_NOFOLLOW_HINT_ONPOST
+                        ),
+
+                'ignore_pages' => array(
+                        'title'=> LAN_NOFOLLOW_EXCLUDE_PAGES, 
+                        'tab'=> 0, 
+                        'type'=>'textarea', 
+                        'data' => 'str', 
+                        'help' => LAN_NOFOLLOW_HINT_EXCLUDE_PAGES
+                        ),
+
+                'ignore_domains' => array(
+                        'title'=> LAN_NOFOLLOW_EXCLUDE_DOMAINS, 
+                        'tab'=> 0, 
+                        'type'=>'textarea', 
+                        'data' => 'str', 
+                        'help' => LAN_NOFOLLOW_HINT_EXCLUDE_DOMAINS
+                        ),
+
+                'parse_method' => array(
+                        'title'=> LAN_NOFOLLOW_PARSE_METHOD_TO_USE, 
+                        'tab'=> 0,
+                        'type' => 'dropdown',
+                        'size' => 'xxlarge',
+                        'data' => 'str', 
+                        'help' => LAN_NOFOLLOW_HINT_PARSE_METHOD )
+                ); 
+
+
+        public function init()
+        {
+            $this->prefs['parse_method']['writeParms'] = $this->parseMethods;
+
+        }
 
 		
-		// ------- Customize Create --------
-		
-		public function beforeCreate($new_data,$old_data)
-		{
-			return $new_data;
-		}
-	
-		public function afterCreate($new_data, $old_data, $id)
-		{
-			// do something
-		}
+        // ------- Customize Create --------
 
-		public function onCreateError($new_data, $old_data)
-		{
-			// do something		
-		}		
-		
-		
-		// ------- Customize Update --------
-		
-		public function beforeUpdate($new_data, $old_data, $id)
-		{
-			return $new_data;
-		}
+        public function beforeCreate($new_data,$old_data)
+        {
+                return $new_data;
+        }
 
-		public function afterUpdate($new_data, $old_data, $id)
-		{
-			// do something	
-		}
-		
-		public function onUpdateError($new_data, $old_data, $id)
-		{
-			// do something		
-		}		
-		
-			
-	/*	
-		// optional - a custom page.  
-		public function customPage()
-		{
-			$text = 'Hello World!';
-			$otherField  = $this->getController()->getFieldVar('other_field_name');
-			return $text;
-			
-		}
-	*/
+        public function afterCreate($new_data, $old_data, $id)
+        {
+                // do something
+        }
+
+        public function onCreateError($new_data, $old_data)
+        {
+                // do something		
+        }		
+
+
+        // ------- Customize Update --------
+
+        public function beforeUpdate($new_data, $old_data, $id)
+        {
+                return $new_data;
+        }
+
+        public function afterUpdate($new_data, $old_data, $id)
+        {
+                // do something	
+        }
+
+        public function onUpdateError($new_data, $old_data, $id)
+        {
+                // do something		
+        }		
+
+
+/*	
+        // optional - a custom page.  
+        public function customPage()
+        {
+                $text = 'Hello World!';
+                $otherField  = $this->getController()->getFieldVar('other_field_name');
+                return $text;
+
+        }
+*/
 			
 }
 				
