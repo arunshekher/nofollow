@@ -98,7 +98,7 @@ class nofollow_parse
         {
             if ( is_array( self::$_Prefs ) && isset( self::$_Prefs['globally_on'] ) )
             {
-                return self::$_Prefs['globally_on'];
+                return intval( self::$_Prefs['globally_on'] );
             }
             
             return false;
@@ -439,7 +439,8 @@ class nofollow_parse
             
             foreach ( $anchors as $anchor )
             {
-                if ( $anchor->rel == 'nofollow' )
+                /*
+                if ( (string) $anchor->rel == 'nofollow' )
                 {
                     continue;
                 }
@@ -447,9 +448,33 @@ class nofollow_parse
                 {
                     $anchor->rel = 'nofollow';
                 }
+                */
+                // if no 'nofollow' & yes 'external' then add nofollow and add target=_blank
+                
+                if ( (string) $anchor->rel == 'nofollow' )
+                {
+                    continue;
+                }
+                
+                if (  ( strpos(  (string) $anchor->rel, 'nofollow' ) === false )  
+                        && strpos( (string) $anchor->rel, 'external' ) !== false )
+                {
+                    $anchor->rel = 'nofollow';
+                    $anchor->target = '_blank';
+                }
+                else
+                {
+                    $anchor->rel = 'nofollow';
+                } 
+                
+              
             }
             
-            return $dom->save();
+            $text = $dom->save();
+            
+            $dom->clear();
+            
+            return $text;
         }
         
         
