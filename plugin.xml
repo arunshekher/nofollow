@@ -14,9 +14,10 @@
 		<link url="admin_config.php" description="" icon="" iconSmall="" icon128="" primary="true" >LAN_CONFIGURE</link>
 	</adminLinks>
 	<pluginPrefs>
-		<pref name='Activate NoFollow?'>1</pref>
-		<pref name='Activate &#39;NoFollow Onpost&#39;?'>0</pref>
-		<pref name='Omit Pages: '></pref>
-		<pref name='Omit Domains:'>SITEBASEURL</pref>
+		<pref name='globally_on'>1</pref>
+		<pref name='onpost_on'>0</pref>
+		<pref name='ignore_pages'></pref>
+		<pref name='ignore_domains'>SITEBASEURL</pref>
+                <pref name='parse_method'>regexHtmlParse_Nofollow</pref>
 	</pluginPrefs>
 </e107Plugin>
