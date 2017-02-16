@@ -48,22 +48,26 @@ class nofollow_parse
          */
         private static $_parseMethod = null;
 
-                const HOST_SITE = SITEURLBASE;
+        const HOST_SITE = SITEURLBASE;
 
 
-        /* constructor */
+        /**
+         * constructor
+         * @return
+         */
 	function __construct()
 	{
-            // if admin area - return
-            if(e_ADMIN_AREA === true) 
+            // if plugin not installed or admin area - return
+            if( /*!e107::isInstalled('nofollow') ||*/ e_ADMIN_AREA === true  ) //TODO: Include exclude page check too here incorporating e107 static getPlugPrefs() method
             { 
                 return; 
             }
             
-            // Begin - set plugin prefs
+            // - set plugin prefs
             self::$_Prefs = self::_getPrefs();
-            // - set status
+            // Begin - set status 
             self::$_Active = self::_getStatus();
+            
             // - set exclude pages
             self::$_excludePages = self::_getExcludePages();
             // - set exclude domains
@@ -78,6 +82,16 @@ class nofollow_parse
             }
         }
         
+        /**
+         * Get plugin operational status flag
+         * @return integer|boolean
+         */
+        protected static function _getStatus()
+        {
+            //return e107::getPlugPref( 'nofollow', 'globally_on', 0 ) ;
+            return self::$_Prefs['globally_on'];
+            
+        }
         
         /**
          * Retrieve and return plugin preferences
@@ -87,22 +101,6 @@ class nofollow_parse
         protected static function _getPrefs()
         {
             return e107::getPlugPref('nofollow');
-        }
-        
-        
-        /**
-         * Get plugin operational status flag
-         * @return integer|boolean
-         */
-        protected static function _getStatus()
-        {
-            if ( is_array( self::$_Prefs ) && isset( self::$_Prefs['globally_on'] ) )
-            {
-                return intval( self::$_Prefs['globally_on'] );
-            }
-            
-            return false;
-            
         }
         
         /**
@@ -134,7 +132,8 @@ class nofollow_parse
          */
         protected static function _getParseMethod()
         {
-            return trim( e107::getPlugPref( 'nofollow', 'parse_method', 'regexHtmlParse_Nofollow' ) );
+            //return trim( e107::getPlugPref( 'nofollow', 'parse_method', 'regexHtmlParse_Nofollow' ) );
+            return trim( self::$_Prefs['parse_method'] );
         }
         
         
@@ -158,14 +157,12 @@ class nofollow_parse
          */
         protected static function _excludePage()
         {
-            $present_page = e_REQUEST_URI;
+            $present_page = $_SERVER['REQUEST_URI']; //e_REQUEST_URI
             
-            $exclude_pages = "";
+            self::_debugLog($present_page, 'Current-Page');
             
-            if ( strpos( $present_page, $exclude_pages ) !== false )
-            {
-                return true;
-            }
+            return in_array($present_page, self::$_excludePages);
+            
         }
         
         /**
@@ -177,7 +174,12 @@ class nofollow_parse
         protected static function _excludeDomain( $anchor )
         {
             $excludes = 'physioblasts.org';// <-- test implementation
-            if ( strpos( self::_getHrefValue( $anchor ), $excludes ) !== false )
+            
+            $href = self::_getHrefValue( $anchor );
+            
+            self::_debugLog($href);
+            
+            if ( strpos( $href, $excludes ) !== false )
             {
                 return true;
             }
@@ -217,32 +219,46 @@ class nofollow_parse
         //                  RETURN true
         //     ELSE RETURN false
         
+        protected function mandateNofollow( $input )
+        {
+            $href = self::_getHrefValue( $input );
+            
+            if ( ! $href && self::_excludeDomain( $href ) )
+            {
+                return false;
+            }
+            return true;
+        }
+        
         /**
          * @access public
 	 * @param string $text html/text to be processed.
 	 * @param string $context Current context ie.  OLDDEFAULT | BODY | TITLE | SUMMARY | DESCRIPTION | WYSIWYG etc.
 	 * @return string
 	 */
-	public function toHtml( $text, $context='' )
+	public function toHtml( $text, $context = '' )
 	{
-            //@test: calling method with 'name'
-            $method = self::$_parseMethod;
             
             if ( self::$_Active )
             {
-                //require_once e_HANDLER.'benchmark.php';
-                //$bench = new e_benchmark();
-                //$bench->start();
                 
-                $text = self::$method( $text );
+                if ( method_exists( $this, self::$_parseMethod ) )
+                {
+                    //self::benchmark( 'start' );
+                    
+                    $text = call_user_func( array( self, self::$_parseMethod ), $text );
+                    //$text = self::{self::$_parseMethod}( $text );
+                            
+                    //self::benchmark( 'stop' );
+                    
+                    return $text;
+                }
+                else
+                {
+                    return $text;
+                }
                 
-                //$testMethod = 'Nofollow-SimpleDOM-Method-' . time();
-                //$bench->end()->logResult( $testMethod );
-                
-                return $text;
             }
-            
-            
             
             return $text;
 	}
@@ -477,6 +493,29 @@ class nofollow_parse
             return $text;
         }
         
+        
+        /**
+         * 
+         * @param type $flag
+         * @param type $logname
+         */
+        private static function benchmark( $flag )
+        {
+            require_once e_HANDLER.'benchmark.php';
+            $bench = new e_benchmark();
+            $logname = 'Nofollow-' . self::$_parseMethod . '-' . date( 'd-m-Y' );
+            
+            if ( $flag == 'start' )
+            {
+               $bench->start();
+            }
+            
+            if ( $flag == 'stop')
+            {
+               $bench->end()->logResult( $logname );
+            }
+            
+        }
         
         /**
          * Debug logger
