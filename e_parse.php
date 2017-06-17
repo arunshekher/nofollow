@@ -18,7 +18,6 @@
 
 if (!defined('e107_INIT')) { exit; }
 
-
 class nofollow_parse
 {
     
@@ -68,6 +67,12 @@ class nofollow_parse
             // Begin - set status 
             self::$_Active = self::_getStatus();
             
+            // if plugin not active - return
+            if ( !self::$_Active )
+            {
+                return;
+            }
+            
             // - set exclude pages
             self::$_excludePages = self::_getExcludePages();
             // - set exclude domains
@@ -83,7 +88,7 @@ class nofollow_parse
         }
         
         /**
-         * Get plugin operational status flag
+         * Get plugin operation status preference
          * @return integer|boolean
          */
         protected static function _getStatus()
@@ -145,8 +150,7 @@ class nofollow_parse
         protected static function nl_string_toArray( $str_with_nl )
         {
             $str = str_replace( ["\r\n", "\n\r"], "|", $str_with_nl );
-            $array = explode( "|", $str );
-            return array_unique( $array );
+            return array_unique( explode( "|", $str ) );
         }
         
         
@@ -231,6 +235,7 @@ class nofollow_parse
         }
         
         /**
+         * e107 HTML parser hook
          * @access public
 	 * @param string $text html/text to be processed.
 	 * @param string $context Current context ie.  OLDDEFAULT | BODY | TITLE | SUMMARY | DESCRIPTION | WYSIWYG etc.
@@ -244,18 +249,17 @@ class nofollow_parse
                 
                 if ( method_exists( $this, self::$_parseMethod ) )
                 {
-                    //self::benchmark( 'start' );
                     
                     $text = call_user_func( array( self, self::$_parseMethod ), $text );
-                    //$text = self::{self::$_parseMethod}( $text );
-                            
-                    //self::benchmark( 'stop' );
                     
                     return $text;
+                    
                 }
                 else
                 {
+                    
                     return $text;
+                    
                 }
                 
             }
@@ -266,9 +270,9 @@ class nofollow_parse
         
         
         /**
-	 * Adds rel="nofollow" attribute to html anchor tags if not present.
-	 * If already have an rel attr. but no nofollow value, appends nofollow. 
-	 * Inserts rel="nofollow" for everything else passed to it.
+	 * Helper method for regexHtmlParse_Nofollow Add rel="nofollow" attribute to HTML anchor elements if not existing.
+	 * If already have rel attr. but without 'nofollow' value, append 'nofollow' to its value. 
+	 * Insert rel="nofollow" for every other anchor elements passed to it.
 	 * 
 	 * @param str $anchor - string with opening anchor tag that is passed in
 	 * @return str - The modified opening anchor tag string
@@ -303,8 +307,8 @@ class nofollow_parse
 	}	
 	
         /**
-         * Split up $text by html tags and inner text scans for anchor tags and apply 
-         * nofollow to 'suitable' anchor tag candidates
+         * Split up $text by HTML tags and inner text scan for anchor tags and 
+         * apply nofollow to 'suitable' anchor tag candidates
          * (adopted from linkwords plugin.)
          * 
          * @param str $text - text string that will be altered
@@ -326,7 +330,7 @@ class nofollow_parse
             {
                 if ( strpos( $fragment, '<a' ) !== false && ! strpos( $fragment, '<a' ) )
                 { 
-                    if ( ! self::_excludeDomain( $fragment ) ) //@TODO simplify this double negation and too many nesting
+                    if ( ! self::_excludeDomain( $fragment ) ) //@TODO: simplify this double negative conditional and too many nesting
                     {
                         $nf_text .= self::stamp_NoFollow( $fragment );
                     }
@@ -434,18 +438,15 @@ class nofollow_parse
         
         /**
          * Nofollow DOM parser using simple_html_dom.php library
-         * @todo This is a test implementation, implement it properly 
-         * - check for rel='external' in anchor and add target='_blank' in 
-         * those cases like the regex method. Also try to move the 
-         * simple_html_dom.php to e_library.php after studying how exactly 
-         * it works
+         * @todo cleanup unwanted code
          * 
          * @param string - $text
          * @return string - Parsed $text
          */
         protected static function simpleHtmlDomParse_Nofollow( $text )
         {
-            require_once( 'lib/simple_html_dom.php' );
+            //require_once( 'lib/simple_html_dom.php' );
+            e107::library('load', 'simple_html_dom');
             
             $dom = new simple_html_dom;
             
@@ -494,35 +495,13 @@ class nofollow_parse
         }
         
         
-        /**
-         * 
-         * @param type $flag
-         * @param type $logname
-         */
-        private static function benchmark( $flag )
-        {
-            require_once e_HANDLER.'benchmark.php';
-            $bench = new e_benchmark();
-            $logname = 'Nofollow-' . self::$_parseMethod . '-' . date( 'd-m-Y' );
-            
-            if ( $flag == 'start' )
-            {
-               $bench->start();
-            }
-            
-            if ( $flag == 'stop')
-            {
-               $bench->end()->logResult( $logname );
-            }
-            
-        }
         
         /**
          * Debug logger
-         * @param string $content String content that's being passed in as arguement
+         * @param string $content String content that's being passed in as argument
          * @param string $logname Optional log file name
          */
-        private static function _debugLog($content, $logname = 'Nofollow-Debug') {
+        private static function _debugLog( $content, $logname = 'Nofollow-Debug' ) {
             $path = e_PLUGIN.'nofollow/'.$logname.'.log';
             file_put_contents($path, $content."\n", FILE_APPEND);
             unset($path, $content);
