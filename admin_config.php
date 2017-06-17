@@ -90,7 +90,7 @@ class nofollow_ui extends e_admin_ui
                         'title'=> LAN_NOFOLLOW_ACTIVATE, 
                         'tab'=> 0, 
                         'type'=>'boolean', 
-                        'data' => 'str', 
+                        'data' => 'int', 
                         'help' => LAN_NOFOLLOW_HINT_ACTIVATE
                         ),
 
@@ -98,7 +98,7 @@ class nofollow_ui extends e_admin_ui
                         'title'=> LAN_NOFOLLOW_ONPOST_ACTIVATE, 
                         'tab'=> 0, 
                         'type'=>'boolean', 
-                        'data' => 'str', 
+                        'data' => 'int', 
                         'help' => LAN_NOFOLLOW_HINT_ONPOST
                         ),
 
