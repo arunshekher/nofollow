@@ -27,7 +27,10 @@ class nofollow_adminArea extends e_admin_dispatcher
 
 	);	
 	
-	
+	/**
+         * Admin Menu
+         * @var type 
+         */
 	protected $adminMenu = array(
 			
 		'main/prefs' => array('caption'=> LAN_PREFS, 'perm' => 'P'),	
@@ -39,6 +42,10 @@ class nofollow_adminArea extends e_admin_dispatcher
 		'main/edit'	=> 'main/list'				
 	);	
 	
+        /**
+         * Admin Menu title
+         * @var type 
+         */
 	protected $menuTitle = LAN_NOFOLLOW_PLUGIN_TITLE;
 }
 
