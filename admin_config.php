@@ -101,14 +101,6 @@ class nofollow_ui extends e_admin_ui
                         'help' => LAN_NOFOLLOW_HINT_ACTIVATE
                         ),
 
-                'onpost_on' => array(
-                        'title'=> LAN_NOFOLLOW_ONPOST_ACTIVATE, 
-                        'tab'=> 0, 
-                        'type'=>'boolean', 
-                        'data' => 'int', 
-                        'help' => LAN_NOFOLLOW_HINT_ONPOST
-                        ),
-
                 'ignore_pages' => array(
                         'title'=> LAN_NOFOLLOW_EXCLUDE_PAGES, 
                         'tab'=> 0, 
