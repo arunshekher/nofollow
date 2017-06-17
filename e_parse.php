@@ -93,8 +93,7 @@ class nofollow_parse
          */
         protected static function _getStatus()
         {
-            //return e107::getPlugPref( 'nofollow', 'globally_on', 0 ) ;
-            return self::$_Prefs['globally_on'];
+            return self::$_Prefs['active'];
             
         }
         

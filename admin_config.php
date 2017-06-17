@@ -93,7 +93,7 @@ class nofollow_ui extends e_admin_ui
          */
         protected $prefs = array(
 
-                'globally_on' => array( //@TODO Rename to operative_status/in_action or something similar
+                'active' => array(
                         'title'=> LAN_NOFOLLOW_ACTIVATE, 
                         'tab'=> 0, 
                         'type'=>'boolean', 
@@ -177,17 +177,6 @@ class nofollow_ui extends e_admin_ui
                 // do something		
         }		
 
-
-/*	
-        // optional - a custom page.  
-        public function customPage()
-        {
-                $text = 'Hello World!';
-                $otherField  = $this->getController()->getFieldVar('other_field_name');
-                return $text;
-
-        }
-*/
 			
 }
 				
