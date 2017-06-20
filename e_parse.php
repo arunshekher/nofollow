@@ -16,7 +16,15 @@
 
 
 
-if (!defined('e107_INIT')) { exit; }
+if ( !defined('e107_INIT') ) { exit; }
+
+
+//if ( basename( $_SERVER['PHP_SELF'] ) == basename(__FILE__) ) { die('Access denied'); }
+
+if ( e_ADMIN_AREA === true || !e107::isInstalled('nofollow') )
+{
+    return;
+}
 
 class nofollow_parse
 {
@@ -57,7 +65,8 @@ class nofollow_parse
 	function __construct()
 	{
             // if plugin not installed or admin area - return
-            if( /*!e107::isInstalled('nofollow') ||*/ e_ADMIN_AREA === true  ) //TODO: Include exclude page check too here incorporating e107 static getPlugPrefs() method
+            //@TODO: Add exclude page check here
+            if( !e107::isInstalled('nofollow') || e_ADMIN_AREA === true  ) 
             { 
                 return; 
             }
