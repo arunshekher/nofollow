@@ -112,7 +112,7 @@ class nofollow_library
 	 *     to.
 	 *   Additional top-level properties can be registered as needed.
 	 */
-	function config()
+	public function config()
 	{
             // A very simple library. No changing APIs (hence, no versions), no variants. Expected to be extracted into
             // 'e107_web/lib/simple'.
