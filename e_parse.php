@@ -139,8 +139,10 @@ class nofollow_parse
 		if (isset(self::$Prefs['ignore_domains'])) {
 			$domains = self::nlStringToArray(self::$Prefs['ignore_domains']);
 			$domains[] = e_DOMAIN;
+
 			return array_unique($domains);
 		}
+
 		return [e_DOMAIN];
 	}
 
@@ -193,20 +195,6 @@ class nofollow_parse
 
 
 	/**
-	 * Debug logger
-	 *
-	 * @param string $content String content that's being passed in as argument
-	 * @param string $logname Optional log file name
-	 */
-	private static function _debugLog($content, $logname = 'Nofollow-Debug')
-	{
-		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
-		file_put_contents($path, $content . "\n", FILE_APPEND);
-		unset($path, $content);
-	}
-
-
-	/**
 	 * Split up $text by HTML tags and inner text scan for anchor tags and
 	 * apply nofollow to 'suitable' anchor tag candidates
 	 * (adopted from linkwords plugin.)
@@ -239,6 +227,22 @@ class nofollow_parse
 		return $nf_text;
 	}
 
+
+	/**
+	 * Checks if text fragment is an opening anchor tag
+	 *
+	 * @param $fragment
+	 *
+	 * @return bool
+	 */
+	protected static function isOpeningAnchor($fragment)
+	{
+		if (strpos($fragment, '<a') !== false && ! strpos($fragment, '<a')) {
+			return true;
+		}
+
+		return false;
+	}
 
 
 	/**
@@ -290,6 +294,20 @@ class nofollow_parse
 
 
 	/**
+	 * Debug logger
+	 *
+	 * @param string $content String content that's being passed in as argument
+	 * @param string $logname Optional log file name
+	 */
+	private static function _debugLog($content, $logname = 'Nofollow-Debug')
+	{
+		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
+		file_put_contents($path, $content . "\n", FILE_APPEND);
+		unset($path, $content);
+	}
+
+
+	/**
 	 * Helper method for regexHtmlParse_Nofollow Add rel="nofollow" attribute
 	 * to HTML anchor elements if not present. If already have rel attr. but
 	 * no 'nofollow', append 'nofollow' to its value. Insert
@@ -310,8 +328,7 @@ class nofollow_parse
 		if (strpos($anchor, 'rel')) {
 			$pattern = "/rel=([\"'])([^\\1]+?)\\1/";
 			//$replace = "rel=\\1\\2 nofollow\\1";
-			$replace =
-				"rel=\\1\\2 nofollow\\1 target=\"_blank\"";// <-- this works but have to confirm how accurate it is.
+			$replace = "rel=\\1\\2 nofollow\\1 target=\"_blank\"";
 
 			return preg_replace($pattern, $replace, $anchor);
 		} else {
@@ -324,9 +341,7 @@ class nofollow_parse
 
 
 	/**
-	 * Nofollow DOM parser using simple_html_dom.php library
-	 *
-	 * @todo   cleanup unwanted code
+	 * Nofollow DOM parser method using simple_html_dom.php library
 	 *
 	 * @param string - $text
 	 *
@@ -335,8 +350,8 @@ class nofollow_parse
 	 */
 	protected static function simpleHtmlDomParse_Nofollow($text)
 	{
-		//require_once( 'lib/simple_html_dom.php' );
-		e107::library('load', 'simple_html_dom');
+		require_once __DIR__ . '/lib/simple_html_dom.php';
+		//e107::library('load', 'simple_html_dom');
 
 		$dom = new simple_html_dom;
 
@@ -345,19 +360,8 @@ class nofollow_parse
 		$anchors = $dom->find('a');
 
 		foreach ($anchors as $anchor) {
-			/*
-            if ( (string) $anchor->rel == 'nofollow' )
-            {
-                continue;
-            }
-            else
-            {
-                $anchor->rel = 'nofollow';
-            }
-            */
-			// if no 'nofollow' & yes 'external' then add nofollow and add target=_blank
 
-			if ((string)$anchor->rel == 'nofollow') {
+			if ((string)$anchor->rel == 'nofollow' || self::hasExcludeDomain($anchor) || self::excludePage()) {
 				continue;
 			}
 
@@ -370,8 +374,6 @@ class nofollow_parse
 			} else {
 				$anchor->rel = 'nofollow';
 			}
-
-
 		}
 
 		$text = $dom->save();
@@ -379,20 +381,6 @@ class nofollow_parse
 		$dom->clear();
 
 		return $text;
-	}
-
-
-	/**
-	 * @param $fragment
-	 *
-	 * @return bool
-	 */
-	protected static function isOpeningAnchor($fragment)
-	{
-		if (strpos($fragment, '<a') !== false && ! strpos($fragment,'<a'))  {
-			return true;
-		}
-		return false;
 	}
 
 
@@ -436,6 +424,7 @@ class nofollow_parse
 	 * TODO: This Method
 	 * check the Opening anchor tag has an href value and is valid and the
 	 * domain name in the href value is not an excludeDomain
+	 *
 	 * @param $input
 	 *
 	 * @return bool
