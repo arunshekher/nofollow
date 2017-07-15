@@ -73,8 +73,7 @@ class nofollow_parse
 		// Begin - set status
 		self::$Active = self::getStatus();
 
-		// if plugin not active - return
-		// todo: seems it doesn't work either. Need to implement it all in toHtml method
+		// if plugin not active - return <-- this works but exclude pages check at L 90 doesn't
 		if ( ! self::$Active) {
 			return;
 		}
@@ -87,8 +86,8 @@ class nofollow_parse
 		self::$parseMethod = self::getParseMethod();
 
 		// If an exclude page - return
-		// todo: doesn't work this way has to implement down the line like exclude domains or make use of context
-		if (self::excludePage()) {
+		// todo: doesn't work this way think it has to be implemented down the line like exclude domains or make use of context
+		if (self::isExcludePage()) {
 			return;
 		}
 	}
@@ -176,16 +175,16 @@ class nofollow_parse
 	/**
 	 * Checks if current/present page has a strpos of exclude page
 	 *
-	 * @todo preferably need a foreach loop to loop through all the listed
+	 * @todo do an if empty check for excludePages pref
 	 *       exclude pages
 	 * @return boolean
 	 */
-	protected static function excludePage()
+	protected static function isExcludePage()
 	{
-		$present_page = e_REQUEST_URI; //$_SERVER['REQUEST_URI']
+		$current_page = e_REQUEST_URI; //$_SERVER['REQUEST_URI']
 
 		foreach (self::$excludePages as $xpage) {
-			if (strpos($present_page, $xpage) !== false) {
+			if (strpos($current_page, $xpage) !== false) {
 				return true;
 			}
 		}
@@ -217,8 +216,8 @@ class nofollow_parse
 			PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
 		foreach ($fragments as $fragment) {
-			if (self::isOpeningAnchor($fragment) && ! self::hasExcludeDomain($fragment)) {
-				$nf_text .= self::stamp_NoFollow($fragment);
+			if (self::isOpeningAnchor($fragment) && self::needNofollow($fragment)) {
+				$nf_text .= self::stampNoFollow($fragment);
 			} else {
 				$nf_text .= $fragment;
 			}
@@ -237,7 +236,7 @@ class nofollow_parse
 	 */
 	protected static function isOpeningAnchor($fragment)
 	{
-		if (strpos($fragment, '<a') !== false && ! strpos($fragment, '<a')) {
+		if (stripos($fragment, '<a') !== false && ! strpos($fragment, '<a')) {
 			return true;
 		}
 
@@ -246,28 +245,24 @@ class nofollow_parse
 
 
 	/**
-	 * Checks if the anchor tag URL is an excluded domain
+	 * Checks if anchor need nofollow
+	 * @param $anchor
 	 *
-	 * @param string $anchor
-	 *
-	 * @return boolean
-	 * @todo make check for http:// https:// and domain within this method and rename it to needNofollow or something similar
+	 * @return bool
 	 */
-	protected static function hasExcludeDomain($anchor)
+	protected static function needNofollow($anchor)
 	{
-		$excludes = self::$excludeDomains;
-
-		$href = self::getHrefValue($anchor);
-		// todo: check here if href is null/empty and or it has an http:// https:// prefix  or a domain name if not return false.
-		if (null !== $href) {
-			foreach ($excludes as $exclude) {
-				if (strpos($href, $exclude) !== false) {
-					return true;
-				}
-			}
+		$hrefValue = self::getHrefValue($anchor);
+		// todo: isExcludePage can be implemented in toHtml method
+		if (null === $hrefValue || self::isExcludeDomain($hrefValue) || self::isExcludePage()) {
+			return false;
+		}
+		if (self::isValidExternalUrl($hrefValue)) {
+			return true;
 		}
 
 		return false;
+
 	}
 
 
@@ -280,11 +275,11 @@ class nofollow_parse
 	 */
 	protected static function getHrefValue($anchor)
 	{
-		preg_match('~<a (?>[^>h]++|\Bh|h(?!ref\b))*href\s*=\s*["\']?\K[^"\'>\s]++~i',
-			$anchor, $matches);
+		$pattern =
+			'~<a (?>[^>h]++|\Bh|h(?!ref\b))*href\s*=\s*["\']?\K[^"\'>\s]++~i';
 
-		if ($matches) {
-			return $matches[0];
+		if (preg_match($pattern, $anchor, $match)) {
+			return $match[0];
 		}
 
 		return null;
@@ -292,16 +287,41 @@ class nofollow_parse
 
 
 	/**
-	 * Debug logger
+	 * Checks if given URL string is in the excluded domains list
 	 *
-	 * @param string $content String content that's being passed in as argument
-	 * @param string $logname Optional log file name
+	 * @param $input
+	 *
+	 * @return bool
 	 */
-	private static function _debugLog($content, $logname = 'Nofollow-Debug')
+	protected static function isExcludeDomain($input)
 	{
-		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
-		file_put_contents($path, $content . "\n", FILE_APPEND);
-		unset($path, $content);
+		foreach (self::$excludeDomains as $exclude) {
+			if (stripos($input, $exclude) !== false) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Checks if given string is a valid URL
+	 *
+	 * @param $input
+	 *
+	 * @return bool
+	 */
+	protected static function isValidExternalUrl($input)
+	{
+		$url_pattern =
+			'/((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+'
+			. '\.([a-zA-Z0-9\&\.\/\?\:@\-_=#]){2,}/';
+		if (preg_match($url_pattern, $input)) {
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -317,7 +337,7 @@ class nofollow_parse
 	 * @access protected
 	 * @todo   may be refactor the name to 'insert_Nofollow' or 'add_Nofollow'
 	 */
-	protected static function stamp_NoFollow($anchor)
+	protected static function stampNoFollow($anchor)
 	{
 		if (strpos($anchor, 'nofollow')) {
 			return $anchor;
@@ -359,7 +379,7 @@ class nofollow_parse
 
 		foreach ($anchors as $anchor) {
 
-			if ((string)$anchor->rel == 'nofollow' || self::hasExcludeDomain($anchor) || self::excludePage()) {
+			if ((string)$anchor->rel === 'nofollow' || ! self::needNofollow($anchor) || self::isExcludePage()) {
 				continue;
 			}
 
@@ -379,6 +399,20 @@ class nofollow_parse
 		$dom->clear();
 
 		return $text;
+	}
+
+
+	/**
+	 * Debug logger
+	 *
+	 * @param string $content String content that's being passed in as argument
+	 * @param string $logname Optional log file name
+	 */
+	private static function _debugLog($content, $logname = 'Nofollow-Debug')
+	{
+		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
+		file_put_contents($path, $content . "\n", FILE_APPEND);
+		unset($path, $content);
 	}
 
 
@@ -419,26 +453,30 @@ class nofollow_parse
 
 
 	/**
-	 * TODO: This Method
-	 * check the Opening anchor tag has an href value and is valid and the
-	 * domain name in the href value is not an excludeDomain
+	 * Checks if the anchor tag URL is an excluded domain
 	 *
-	 * @param $input
+	 * @param string $anchor
 	 *
-	 * @return bool
+	 * @return boolean
+	 * @todo make check for http:// https:// and domain within this method and
+	 *     rename it to needNofollow or something similar
 	 */
-	protected function mandateNofollow($input)
+	protected static function hasExcludeDomain($anchor)
 	{
-		$href = self::getHrefValue($input);
+		$excludes = self::$excludeDomains;
 
-		if (null === $href || self::hasExcludeDomain($href)) {
-			return false;
+		$href = self::getHrefValue($anchor);
+		// todo: check here if href has an http:// https:// prefix  or a domain name if not return false.
+		if (null !== $href && self::isValidExternalUrl($href)) { // todo: and notExclude domain need nofollow
+			foreach ($excludes as $exclude) {
+				if (strpos($href, $exclude) !== false) {
+					return true;
+				}
+			}
 		}
 
-		return true;
+		return false;
 	}
-
-
 
 
 }
