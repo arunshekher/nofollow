@@ -20,6 +20,7 @@ if ( ! defined('e107_INIT')) {
 
 //if ( basename( $_SERVER['PHP_SELF'] ) == basename(__FILE__) ) { die('Access denied'); }
 
+// if plugin not installed or admin area - return // todo: doesn't seem to work - check if it is creating a loop
 if (e_ADMIN_AREA === true || ! e107::isInstalled('nofollow')) {
 	return;
 }
@@ -28,40 +29,37 @@ if (e_ADMIN_AREA === true || ! e107::isInstalled('nofollow')) {
 class nofollow_parse
 {
 
-	/**
-	 *
-	 */
-	const HOST_SITE = SITEURLBASE;
+
 	/**
 	 * Plugin Preferences
 	 *
 	 * @var array
 	 */
-	private static $_Prefs = [];
+	private static $Prefs = [];
 	/**
 	 * Operational status
 	 *
 	 * @var boolean
 	 */
-	private static $_Active = false;
+	private static $Active = false;
 	/**
 	 * Exclude/ignore domains
 	 *
 	 * @var array
 	 */
-	private static $_excludeDomains = [];
+	private static $excludeDomains = [];
 	/**
 	 * Exclude/ignore pages
 	 *
 	 * @var array
 	 */
-	private static $_excludePages = [];
+	private static $excludePages = [];
 	/**
 	 * Parsing method used
 	 *
 	 * @var type
 	 */
-	private static $_parseMethod = null;
+	private static $parseMethod = null;
 
 
 	/**
@@ -69,31 +67,28 @@ class nofollow_parse
 	 */
 	public function __construct()
 	{
-		// if plugin not installed or admin area - return
-		//@TODO: Add exclude page check here
-		if ( ! e107::isInstalled('nofollow') || e_ADMIN_AREA === true) {
-			return;
-		}
 
 		// - set plugin prefs
-		self::$_Prefs = self::_getPrefs();
+		self::$Prefs = self::getPrefs();
 		// Begin - set status
-		self::$_Active = self::_getStatus();
+		self::$Active = self::getStatus();
 
 		// if plugin not active - return
-		if ( ! self::$_Active) {
+		// todo: seems it doesn't work either. Need to implement it all in toHtml method
+		if ( ! self::$Active) {
 			return;
 		}
 
 		// - set exclude pages
-		self::$_excludePages = self::_getExcludePages();
+		self::$excludePages = self::getExcludePages();
 		// - set exclude domains
-		self::$_excludeDomains = self::_getExcludeDomains();
+		self::$excludeDomains = self::getExcludeDomains();
 		// - set parse method
-		self::$_parseMethod = self::_getParseMethod();
+		self::$parseMethod = self::getParseMethod();
 
 		// If an exclude page - return
-		if (self::_excludePage()) {
+		// todo: doesn't work this way has to implement down the line like exclude domains or make use of context
+		if (self::excludePage()) {
 			return;
 		}
 	}
@@ -105,7 +100,7 @@ class nofollow_parse
 	 * @access protected
 	 * @return array associative array of plugin preferences
 	 */
-	protected static function _getPrefs()
+	protected static function getPrefs()
 	{
 		return e107::getPlugPref('nofollow');
 	}
@@ -116,9 +111,9 @@ class nofollow_parse
 	 *
 	 * @return integer|boolean
 	 */
-	protected static function _getStatus()
+	protected static function getStatus()
 	{
-		return self::$_Prefs['active'];
+		return self::$Prefs['active'];
 
 	}
 
@@ -128,24 +123,25 @@ class nofollow_parse
 	 *
 	 * @return array
 	 */
-	protected static function _getExcludePages()
+	protected static function getExcludePages()
 	{
-		return explode("\n", self::$_Prefs['ignore_pages']);
+		return explode("\n", self::$Prefs['ignore_pages']);
 	}
 
 
 	/**
 	 * Get exclude pages as a numeric array
 	 *
-	 * @return array|string
+	 * @return array
 	 */
-	protected static function _getExcludeDomains()
+	protected static function getExcludeDomains()
 	{
-		if (isset(self::$_Prefs['ignore_domains'])) {
-			return self::nl_string_toArray(self::$_Prefs['ignore_domains']);
+		if (isset(self::$Prefs['ignore_domains'])) {
+			$domains = self::nlStringToArray(self::$Prefs['ignore_domains']);
+			$domains[] = e_DOMAIN;
+			return array_unique($domains);
 		}
-
-		return e_DOMAIN;
+		return [e_DOMAIN];
 	}
 
 
@@ -156,7 +152,7 @@ class nofollow_parse
 	 *
 	 * @return array
 	 */
-	protected static function nl_string_toArray($str_with_nl)
+	protected static function nlStringToArray($str_with_nl)
 	{
 		$str = str_replace(["\r\n", "\n\r"], "|", $str_with_nl);
 
@@ -169,9 +165,9 @@ class nofollow_parse
 	 *
 	 * @return string
 	 */
-	protected static function _getParseMethod()
+	protected static function getParseMethod()
 	{
-		return trim(self::$_Prefs['parse_method']);
+		return trim(self::$Prefs['parse_method']);
 	}
 
 
@@ -182,14 +178,17 @@ class nofollow_parse
 	 *       exclude pages
 	 * @return boolean
 	 */
-	protected static function _excludePage()
+	protected static function excludePage()
 	{
 		$present_page = $_SERVER['REQUEST_URI']; //e_REQUEST_URI
 
-		self::_debugLog($present_page, 'Current-Page');
+		foreach (self::$excludePages as $xpage) {
+			if (strpos($present_page, $xpage) !== false) {
+				return true;
+			}
+		}
 
-		return in_array($present_page, self::$_excludePages);
-
+		return false;
 	}
 
 
@@ -241,21 +240,6 @@ class nofollow_parse
 	}
 
 
-	/**
-	 * @psuedocode
-	 * A combined method for checking excluded domains and internal links
-	 * Method name: 'needNofollow' 'requireNofollow' or something similar
-	 */
-	// Get the anchor tag fragment
-	//      IF has href value
-	//              IF has a base domain in Href value
-	//                  IF the domain is listed in exclude list
-	//                      RETURN true
-	//                  ELSE
-	//                      RETURN false
-	//              ELSE
-	//                  RETURN true
-	//     ELSE RETURN false
 
 	/**
 	 * Check if the anchor tag URL is an excluded domain
@@ -268,9 +252,9 @@ class nofollow_parse
 	 */
 	protected static function hasExcludeDomain($anchor)
 	{
-		$excludes = self::$_excludeDomains;
+		$excludes = self::$excludeDomains;
 
-		$href = self::_getHrefValue($anchor);
+		$href = self::getHrefValue($anchor);
 
 		// debug
 		self::_debugLog($href);
@@ -292,7 +276,7 @@ class nofollow_parse
 	 *
 	 * @return string href attribute value | null
 	 */
-	protected static function _getHrefValue($anchor)
+	protected static function getHrefValue($anchor)
 	{
 		preg_match('~<a (?>[^>h]++|\Bh|h(?!ref\b))*href\s*=\s*["\']?\K[^"\'>\s]++~i',
 			$anchor, $matches);
@@ -426,9 +410,9 @@ class nofollow_parse
 	{
 		// todo: use context - USER_TITLE, USER_BODY is all that's really needs
 		// ..checking but can also use BODY and title which is used in news. Need to understand more
-		if (self::$_Active) {
+		if (self::$Active) {
 
-			$method = self::$_parseMethod;
+			$method = self::$parseMethod;
 
 			if (method_exists($this, $method)) {
 
@@ -449,13 +433,16 @@ class nofollow_parse
 
 
 	/**
+	 * TODO: This Method
+	 * check the Opening anchor tag has an href value and is valid and the
+	 * domain name in the href value is not an excludeDomain
 	 * @param $input
 	 *
 	 * @return bool
 	 */
 	protected function mandateNofollow($input)
 	{
-		$href = self::_getHrefValue($input);
+		$href = self::getHrefValue($input);
 
 		if (null === $href || self::hasExcludeDomain($href)) {
 			return false;
