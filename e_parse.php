@@ -148,7 +148,7 @@ class nofollow_parse
 
 
 	/**
-	 * Helper method - Convert newline delimited string to numeric array
+	 * Helper method - Converts newline delimited string to numeric array
 	 *
 	 * @param type $str_with_nl
 	 *
@@ -174,7 +174,7 @@ class nofollow_parse
 
 
 	/**
-	 * Check if present page is a strpos of exclude page
+	 * Checks if current/present page has a strpos of exclude page
 	 *
 	 * @todo preferably need a foreach loop to loop through all the listed
 	 *       exclude pages
@@ -182,7 +182,7 @@ class nofollow_parse
 	 */
 	protected static function excludePage()
 	{
-		$present_page = $_SERVER['REQUEST_URI']; //e_REQUEST_URI
+		$present_page = e_REQUEST_URI; //$_SERVER['REQUEST_URI']
 
 		foreach (self::$excludePages as $xpage) {
 			if (strpos($present_page, $xpage) !== false) {
@@ -195,7 +195,7 @@ class nofollow_parse
 
 
 	/**
-	 * Split up $text by HTML tags and inner text scan for anchor tags and
+	 * Splits up $text by HTML tags and inner text scan for anchor tags and
 	 * apply nofollow to 'suitable' anchor tag candidates
 	 * (adopted from linkwords plugin.)
 	 *
@@ -229,7 +229,7 @@ class nofollow_parse
 
 
 	/**
-	 * Checks if text fragment is an opening anchor tag
+	 * Tells if the text fragment is an opening anchor tag
 	 *
 	 * @param $fragment
 	 *
@@ -246,26 +246,24 @@ class nofollow_parse
 
 
 	/**
-	 * Check if the anchor tag URL is an excluded domain
+	 * Checks if the anchor tag URL is an excluded domain
 	 *
 	 * @param string $anchor
 	 *
 	 * @return boolean
-	 * @todo add foreach loop to iterate through all exclude domains when have
-	 *       multiple
+	 * @todo make check for http:// https:// and domain within this method and rename it to needNofollow or something similar
 	 */
 	protected static function hasExcludeDomain($anchor)
 	{
 		$excludes = self::$excludeDomains;
 
 		$href = self::getHrefValue($anchor);
-
-		// debug
-		self::_debugLog($href);
-
-		foreach ($excludes as $exclude) {
-			if (strpos($href, $exclude) !== false) {
-				return true;
+		// todo: check here if href is null/empty and or it has an http:// https:// prefix  or a domain name if not return false.
+		if (null !== $href) {
+			foreach ($excludes as $exclude) {
+				if (strpos($href, $exclude) !== false) {
+					return true;
+				}
 			}
 		}
 
@@ -308,7 +306,7 @@ class nofollow_parse
 
 
 	/**
-	 * Helper method for regexHtmlParse_Nofollow Add rel="nofollow" attribute
+	 * Helper method - for regexHtmlParse_Nofollow Add rel="nofollow" attribute
 	 * to HTML anchor elements if not present. If already have rel attr. but
 	 * no 'nofollow', append 'nofollow' to its value. Insert
 	 * rel="nofollow" for every other anchor elements passed to it.
@@ -441,25 +439,6 @@ class nofollow_parse
 	}
 
 
-	/**
-	 * Boilerplate Sub-method to break-apart the above method logic for
-	 * simplicity and maintainalbility and add the operational conditional
-	 * checks of plugin
-	 *
-	 * @param string $anchor
-	 *
-	 * @return string
-	 * @todo develop the method, do the hasExcludeDomain() and internal link
-	 *       checks here
-	 */
-	protected function processAnchor($anchor)
-	{
-		// IF hasExcludeDomain() OR internalLink()
-		//      RETURN $anchor
-		// ELSE
-		//      RETURN stamp_Nofollow( $anchor );
-		return $processed;
-	}
 
 
 }
