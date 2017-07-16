@@ -61,10 +61,6 @@ class nofollow_parse
 	 */
 	private static $parseMethod;
 	private static $filterContext;
-	// todo: Scan Context
-	// 1) Only user posted - USER_TITLE, USER_BODY
-	// 2) User and Admin posted -
-	// 3) Everything
 
 
 	/**
@@ -118,7 +114,7 @@ class nofollow_parse
 	 */
 	protected static function getExcludePages()
 	{
-		return explode("\n", self::$Prefs['ignore_pages']);
+		return self::nlStringToArray(self::$Prefs['ignore_pages']);
 	}
 
 
@@ -150,12 +146,12 @@ class nofollow_parse
 	{
 		$str = str_replace(["\r\n", "\n\r"], "|", $str_with_nl);
 
-		return array_unique(explode("|", $str));
+		return explode("|", $str);
 	}
 
 
 	/**
-	 * Get parse method preference
+	 * Gets parse method preference
 	 *
 	 * @return string
 	 */
@@ -166,7 +162,7 @@ class nofollow_parse
 
 
 	/**
-	 * Checks if current/present page has a strpos of exclude page
+	 * Checks if current/present page matches an exclude page
 	 *
 	 * @todo do an if empty check for excludePages pref
 	 *       exclude pages
@@ -183,23 +179,19 @@ class nofollow_parse
 			}
 		}
 
-
 		return false;
 	}
 
 
 	/**
 	 * Splits up $text by HTML tags and inner text scan for anchor tags and
-	 * apply nofollow to 'suitable' anchor tag candidates
+	 * apply 'nofollow' to 'suitable' anchor tag candidates
 	 * (adopted from linkwords plugin.)
 	 *
-	 * @param str  $text - text string that will be altered
-	 * @param str  $opts ['context'] - default context
-	 * @param bool $logflag - switch to log the makenofollow on post
+	 * @param string $text
 	 *
 	 * @return string Modified text
 	 * @access protected
-	 * @todo   fix omit based on contexts
 	 */
 	protected static function regexHtmlParse_Nofollow($text)
 	{
@@ -239,7 +231,7 @@ class nofollow_parse
 
 
 	/**
-	 * Checks if anchor need nofollow
+	 * Checks if anchor need NoFollow
 	 * @param $anchor
 	 *
 	 * @return bool
@@ -321,15 +313,12 @@ class nofollow_parse
 
 	/**
 	 * Helper method - for regexHtmlParse_Nofollow Add rel="nofollow" attribute
-	 * to HTML anchor elements if not present. If already have rel attr. but
-	 * no 'nofollow', append 'nofollow' to its value. Insert
-	 * rel="nofollow" for every other anchor elements passed to it.
+	 * to HTML anchor elements if not present.
 	 *
-	 * @param $anchor - string with opening anchor tag that is passed in
+	 * @param $anchor - string opening anchor tag
 	 *
-	 * @return string - The modified opening anchor tag string
+	 * @return string
 	 * @access protected
-	 * @todo   may be refactor the name to 'insert_Nofollow' or 'add_Nofollow'
 	 */
 	protected static function stampNoFollow($anchor)
 	{
@@ -432,25 +421,24 @@ class nofollow_parse
 	 */
 	protected static function isInContext($context)
 	{
-		$contextPref = e107::getPlugPref('nofollow', 'filter_context');
-		$contextList = self::getContextList($contextPref);
-		if (null !== $contextList) {
-			foreach ($contextList as $contextItem) {
-				if ($contextItem === $context) return true;
-			}
+		$contextList = self::getContextList();
+		if (null === $contextList) {
+			return true;
 		}
-
+		foreach ($contextList as $contextItem) {
+			if ($contextItem === $context) return true;
+		}
 		return false;
 	}
 
 
 	/**
-	 * @param $pref
-	 *
-	 * @return array
+	 * Gets context list according to preference
+	 * @return array|null
 	 */
-	protected static function getContextList($pref)
+	protected static function getContextList()
 	{
+		$pref = e107::getPlugPref('nofollow', 'filter_context');
 		switch ($pref) {
 			case 1:
 				return ['USER_TITLE', 'USER_BODY'];
@@ -461,9 +449,7 @@ class nofollow_parse
 			case 3:
 				return null;
 				break;
-
 		}
-
 	}
 
 	/**
