@@ -70,6 +70,12 @@ class nofollow_ui extends e_admin_ui
 		'simpleHtmlDomParse_Nofollow' => LAN_NOFOLLOW_SIMPLE_HTML_DOM_PARSER,
 	];
 
+	protected $filterContexts = [
+		1 => 'User-Posted',
+		2 => 'User-And-Admin-Posted',
+		3 => 'Everything'
+	];
+
 	/**
 	 * @var type
 	 */
@@ -119,12 +125,23 @@ class nofollow_ui extends e_admin_ui
 			'data'  => 'str',
 			'help'  => LAN_NOFOLLOW_HINT_PARSE_METHOD,
 		],
+
+		'filter_context' => [
+			'title' => 'NoFollow Filter Context (For Content)',
+			'tab'   => 0,
+			'type'  => 'dropdown',
+			'size'  => 'xxlarge',
+			'data'  => 'int',
+			'help'  => 'In what context NoFollow parse filter is called for.',
+		],
 	];
 
 
 	public function init()
 	{
 		$this->prefs['parse_method']['writeParms'] = $this->parseMethods;
+		$this->prefs['filter_context']['writeParms'] = $this->filterContexts;
+		$this->simpleDomParseLibWarning();
 
 	}
 
@@ -166,6 +183,16 @@ class nofollow_ui extends e_admin_ui
 	public function onUpdateError($new_data, $old_data, $id)
 	{
 		// do something
+	}
+
+
+	private function simpleDomParseLibWarning()
+	{
+		$parseMethod = e107::pref('nofollow', 'parse_method');
+		if ($parseMethod === 'simpleHtmlDomParse_Nofollow') {
+			e107::getMessage()
+				->addWarning('You need to install Simple DOM Parse Library to use ' . LAN_NOFOLLOW_SIMPLE_HTML_DOM_PARSER);
+		}
 	}
 
 
