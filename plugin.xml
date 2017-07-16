@@ -15,9 +15,9 @@
 	</adminLinks>
 	<pluginPrefs>
 		<pref name='globally_on'>1</pref>
-		<pref name='onpost_on'>0</pref>
 		<pref name='ignore_pages'></pref>
 		<pref name='ignore_domains'></pref>
 		<pref name='parse_method'>regexHtmlParse_Nofollow</pref>
+		<pref name='filter_context'>2</pref>
 	</pluginPrefs>
 </e107Plugin>
