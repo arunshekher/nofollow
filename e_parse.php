@@ -132,7 +132,6 @@ class nofollow_parse
 		if (isset(self::$Prefs['ignore_domains'])) {
 			$domains = self::nlStringToArray(self::$Prefs['ignore_domains']);
 			$domains[] = e_DOMAIN;
-
 			return array_unique($domains);
 		}
 
@@ -176,12 +175,14 @@ class nofollow_parse
 	protected static function isExcludePage()
 	{
 		$current_page = e_REQUEST_URI; //$_SERVER['REQUEST_URI']
-
-		foreach (self::$excludePages as $xpage) {
-			if (strpos($current_page, $xpage) !== false) {
-				return true;
+		if (count(self::$excludePages)) {
+			foreach (self::$excludePages as $xpage) {
+				if (strpos($current_page, $xpage) !== false) {
+					return true;
+				}
 			}
 		}
+
 
 		return false;
 	}
@@ -202,7 +203,6 @@ class nofollow_parse
 	 */
 	protected static function regexHtmlParse_Nofollow($text)
 	{
-
 		$nf_text = '';
 
 		$pattern = '#(<.*?>)#mis';
@@ -210,7 +210,7 @@ class nofollow_parse
 			PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
 		foreach ($fragments as $fragment) {
-			if (self::isOpeningAnchor($fragment) && self::needNofollow($fragment)) {
+			if (self::isOpeningAnchor($fragment) && self::needNoFollow($fragment)) {
 				$nf_text .= self::stampNoFollow($fragment);
 			} else {
 				$nf_text .= $fragment;
@@ -244,7 +244,7 @@ class nofollow_parse
 	 *
 	 * @return bool
 	 */
-	protected static function needNofollow($anchor)
+	protected static function needNoFollow($anchor)
 	{
 		$hrefValue = self::getHrefValue($anchor);
 		// todo: isExcludePage can be implemented in toHtml method
@@ -373,7 +373,7 @@ class nofollow_parse
 
 		foreach ($anchors as $anchor) {
 
-			if ((string)$anchor->rel === 'nofollow' || ! self::needNofollow($anchor) || self::isExcludePage()) {
+			if ((string)$anchor->rel === 'nofollow' || ! self::needNoFollow($anchor) || self::isExcludePage()) {
 				continue;
 			}
 
@@ -407,9 +407,7 @@ class nofollow_parse
 	 */
 	public function toHtml($text, $context = '')
 	{
-		// todo: use context - USER_TITLE, USER_BODY is all that's really needs
-		// ..checking but can also use BODY and title which is used in news. Need to understand more
-		if (self::$Active) {
+		if (self::$Active && self::isInContext($context)) {
 
 			$method = self::$parseMethod;
 
@@ -426,10 +424,46 @@ class nofollow_parse
 	}
 
 
+	/**
+	 * Checks if the currently parsing $text is in NoFollow parse filter context
+	 * @param $context
+	 *
+	 * @return bool
+	 */
 	protected static function isInContext($context)
 	{
 		$contextPref = e107::getPlugPref('nofollow', 'filter_context');
-		
+		$contextList = self::getContextList($contextPref);
+		if (null !== $contextList) {
+			foreach ($contextList as $contextItem) {
+				if ($contextItem === $context) return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * @param $pref
+	 *
+	 * @return array
+	 */
+	protected static function getContextList($pref)
+	{
+		switch ($pref) {
+			case 1:
+				return ['USER_TITLE', 'USER_BODY'];
+				break;
+			case 2:
+				return ['TITLE', 'BODY', 'USER_TITLE', 'USER_BODY'];
+				break;
+			case 3:
+				return null;
+				break;
+
+		}
+
 	}
 
 	/**
