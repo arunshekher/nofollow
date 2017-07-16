@@ -59,7 +59,12 @@ class nofollow_parse
 	 *
 	 * @var type
 	 */
-	private static $parseMethod = null;
+	private static $parseMethod;
+	private static $filterContext;
+	// todo: Scan Context
+	// 1) Only user posted - USER_TITLE, USER_BODY
+	// 2) User and Admin posted -
+	// 3) Everything
 
 
 	/**
@@ -67,17 +72,11 @@ class nofollow_parse
 	 */
 	public function __construct()
 	{
-
+		// todo: make an intitializer method and move all initialization there?
 		// - set plugin prefs
 		self::$Prefs = self::getPrefs();
 		// Begin - set status
 		self::$Active = self::getStatus();
-
-		// if plugin not active - return <-- this works but exclude pages check at L 90 doesn't
-		if ( ! self::$Active) {
-			return;
-		}
-
 		// - set exclude pages
 		self::$excludePages = self::getExcludePages();
 		// - set exclude domains
@@ -85,11 +84,6 @@ class nofollow_parse
 		// - set parse method
 		self::$parseMethod = self::getParseMethod();
 
-		// If an exclude page - return
-		// todo: doesn't work this way think it has to be implemented down the line like exclude domains or make use of context
-		if (self::isExcludePage()) {
-			return;
-		}
 	}
 
 
@@ -317,7 +311,7 @@ class nofollow_parse
 		$url_pattern =
 			'/((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+'
 			. '\.([a-zA-Z0-9\&\.\/\?\:@\-_=#]){2,}/';
-		if (preg_match($url_pattern, $input)) {
+		if (preg_match($url_pattern, trim($input))) {
 			return true;
 		}
 
@@ -401,21 +395,6 @@ class nofollow_parse
 		return $text;
 	}
 
-
-	/**
-	 * Debug logger
-	 *
-	 * @param string $content String content that's being passed in as argument
-	 * @param string $logname Optional log file name
-	 */
-	private static function _debugLog($content, $logname = 'Nofollow-Debug')
-	{
-		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
-		file_put_contents($path, $content . "\n", FILE_APPEND);
-		unset($path, $content);
-	}
-
-
 	/**
 	 * e107 HTML parser hook
 	 *
@@ -440,16 +419,32 @@ class nofollow_parse
 
 				return $text;
 
-			} else {
-
-				return $text;
-
 			}
-
 		}
 
 		return $text;
 	}
+
+
+	protected static function isInContext($context)
+	{
+		$contextPref = e107::getPlugPref('nofollow', 'filter_context');
+		
+	}
+
+	/**
+	 * Debug logger
+	 *
+	 * @param string $content String content that's being passed in as argument
+	 * @param string $logname Optional log file name
+	 */
+	private static function _debugLog($content, $logname = 'Nofollow-Debug')
+	{
+		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
+		file_put_contents($path, $content . "\n", FILE_APPEND);
+		unset($path, $content);
+	}
+
 
 
 	/**
@@ -458,8 +453,6 @@ class nofollow_parse
 	 * @param string $anchor
 	 *
 	 * @return boolean
-	 * @todo make check for http:// https:// and domain within this method and
-	 *     rename it to needNofollow or something similar
 	 */
 	protected static function hasExcludeDomain($anchor)
 	{
