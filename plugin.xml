@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <e107Plugin name="Nofollow" lan="LAN_NOFOLLOW_PLUGIN_TITLE" version="1.3" date="2017-01-13" compatibility="2.0" installRequired="true" >
-	<author name="Arun" url="https://github.com/arunshekher" />
-	<summary lan="">An SEO and SPAM oriented plugin aimed to discourage backlink building SPAM in e107 powered websites.</summary>
-	<description lan="">This is an SEO and SPAM oriented plugin aimed to discourage backlink building SPAM in e107 powered websites by automatically inserting an rel=&#34;nofollow&#34; attribute to posted links in comment, chat, forum and other areas.Links with an rel=&#34;nofollow&#34; attribute generates no positive benefit for the poster in terms of PageRank (or other search engine value). </description>
+	<author name="Arun S. Sekher" url="https://github.com/arunshekher" />
+	<summary lan="">An SEO oriented plugin aimed to discourage Dofollow backlink building SPAM in e107 powered websites.</summary>
+	<description lan="">An SEO oriented plugin aimed to discourage backlink building SPAM in e107 powered websites. Plugin automatically inserts an rel=&#34;nofollow&#34; attribute to posted URLs in comment, chat, forum and other areas. Links with an rel=&#34;nofollow&#34; attribute generate no positive benefit for the poster in terms of PageRank or other search engine value. </description>
 	<keywords>
 		<word>enhancement</word>
 		<word>nofollow</word>
@@ -11,7 +11,7 @@
 	<category>tools</category>
 	<copyright></copyright>
 	<adminLinks>
-		<link url="admin_config.php" description="" icon="" iconSmall="" icon128="" primary="true" >LAN_CONFIGURE</link>
+		<link url="admin_config.php" description=""  icon='images/nofollow_32.png' iconSmall='images/nofollow_16.png' icon128="images/nofollow_128.png" primary="true" >LAN_CONFIGURE</link>
 	</adminLinks>
 	<pluginPrefs>
 		<pref name='active'>1</pref>
