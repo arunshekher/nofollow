@@ -33,7 +33,7 @@ class nofollow_adminArea extends e_admin_dispatcher
 	protected $adminMenu = [
 
 		'main/prefs' => ['caption' => LAN_PREFS, 'perm' => 'P'],
-		//'main/custom' => array('caption'=> 'Custom Page', 'perm' => 'P')
+		'main/help' => array('caption'=> 'Help', 'perm' => 'P')
 
 	];
 
@@ -193,6 +193,27 @@ class nofollow_ui extends e_admin_ui
 			e107::getMessage()
 				->addWarning('You need to install Simple DOM Parse Library to use ' . LAN_NOFOLLOW_SIMPLE_HTML_DOM_PARSER);
 		}
+	}
+
+	public function renderHelp()
+	{
+		$caption = 'Author & Project Info';
+		$text = '<div style="text-align: center">
+					<img src="images/nofollow.svg" alt="Nofollow" width="128" height="128">
+				</div>';
+		$text .= '<p>Developer: Arun S. Sekher</p>';
+
+
+		return ['caption' => $caption, 'text' => $text];
+
+	}
+
+	public function helpPage()
+	{
+		$ns = e107::getRender();
+		$text = "Hello World!";
+		$ns->tablerender("Hello",$text);
+
 	}
 
 
