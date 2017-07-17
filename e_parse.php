@@ -18,14 +18,6 @@ if ( ! defined('e107_INIT')) {
 	exit;
 }
 
-//if ( basename( $_SERVER['PHP_SELF'] ) == basename(__FILE__) ) { die('Access denied'); }
-
-// if plugin not installed or admin area - return // todo: doesn't seem to work - check if it is creating a loop
-if (e_ADMIN_AREA === true || ! e107::isInstalled('nofollow')) {
-	return;
-}
-
-
 class nofollow_parse
 {
 
@@ -60,7 +52,7 @@ class nofollow_parse
 	 * @var type
 	 */
 	private static $parseMethod;
-	private static $filterContext;
+	private static $filterContext;// todo: implement this
 
 
 	/**
@@ -184,6 +176,16 @@ class nofollow_parse
 
 
 	/**
+	 * Checks if admin area
+	 * @return bool
+	 */
+	protected static function isAdminArea()
+	{
+		return e_ADMIN_AREA;
+	}
+
+
+	/**
 	 * Splits up $text by HTML tags and inner text scan for anchor tags and
 	 * apply 'nofollow' to 'suitable' anchor tag candidates
 	 * (adopted from linkwords plugin.)
@@ -240,7 +242,7 @@ class nofollow_parse
 	{
 		$hrefValue = self::getHrefValue($anchor);
 		// todo: isExcludePage can be implemented in toHtml method
-		if (null === $hrefValue || self::isExcludeDomain($hrefValue) || self::isExcludePage()) {
+		if (null === $hrefValue || self::isExcludeDomain($hrefValue)) {
 			return false;
 		}
 		if (self::isValidExternalUrl($hrefValue)) {
@@ -355,17 +357,18 @@ class nofollow_parse
 		//e107::library('load', 'simple_html_dom');
 
 		$dom = new simple_html_dom;
-
 		$dom->load($text);
-
 		$anchors = $dom->find('a');
 
 		foreach ($anchors as $anchor) {
-
-			if ((string)$anchor->rel === 'nofollow' || ! self::needNoFollow($anchor) || self::isExcludePage()) {
+			if (
+				(string)$anchor->rel === 'nofollow' ||
+				self::isAdminArea() ||
+				self::isExcludePage() ||
+				! self::needNoFollow($anchor)
+			) {
 				continue;
 			}
-
 			if ((strpos((string)$anchor->rel,
 						'nofollow') === false) && strpos((string)$anchor->rel,
 					'external') !== false
@@ -378,25 +381,28 @@ class nofollow_parse
 		}
 
 		$text = $dom->save();
-
 		$dom->clear();
 
 		return $text;
 	}
 
 	/**
-	 * e107 HTML parser hook
+	 * e107 HTML parser routine callee
 	 *
 	 * @param string $text html/text to be processed.
-	 * @param string $context Current context ie.  OLDDEFAULT | BODY | TITLE |
-	 *                        SUMMARY | DESCRIPTION | WYSIWYG etc.
+	 * @param string $context current text parse context
 	 *
 	 * @return string
 	 * @access public
 	 */
 	public function toHtml($text, $context = '')
 	{
-		if (self::$Active && self::isInContext($context)) {
+		if (
+			self::$Active &&
+			! self::isAdminArea() &&
+			! self::isExcludePage() &&
+			self::isInContext($context)
+		) {
 
 			$method = self::$parseMethod;
 
