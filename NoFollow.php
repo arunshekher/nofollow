@@ -339,7 +339,7 @@ abstract class NoFollow
 	 */
 	protected static function simpleHtmlDomParse_Nofollow($text)
 	{
-		self::resolveLibPath();
+		self::loadLib();
 
 		$dom = new simple_html_dom;
 		$dom->load($text);
@@ -375,7 +375,7 @@ abstract class NoFollow
 	/**
 	 * Resolve simple dom parser class path based on admin pref.
 	 */
-	protected static function resolveLibPath()
+	protected static function loadLib()
 	{
 		if (self::$Prefs['use_global_path']) {
 			e107::library('load', 'simple_html_dom');
