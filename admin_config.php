@@ -81,7 +81,7 @@ class nofollow_ui extends e_admin_ui
 	/**
 	 *
 	 */
-	//protected $preftabs = array('General', 'Other' );
+	//protected $preftabs = array('General Settings', 'Manage Exclusions', 'Manage Parse Method' );
 
 	/**
 	 * Plugin preferences
@@ -205,7 +205,7 @@ class nofollow_ui extends e_admin_ui
 
 	public function renderHelp()
 	{
-		$caption = 'Author & Project Info';
+		$caption = 'Project Info';
 		$text = '<div style="text-align: center">
 					<img src="images/nofollow.svg" alt="Nofollow" width="128" height="128">
 				</div>';
