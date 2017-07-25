@@ -201,7 +201,8 @@ class nofollow_ui extends e_admin_ui
 		$text = '<div style="text-align: center">
 					<img src="images/nofollow.svg" alt="Nofollow" width="128" height="128">
 				</div>';
-		$text .= '<p>Developer: Arun S. Sekher</p>';
+		$text .= '<br><p>Project link on github: http://github.com/arunshekher/nofollow</p>';
+		$text .= '<p>Author: Arun S. Sekher</p>';
 
 
 		return ['caption' => $caption, 'text' => $text];
