@@ -115,17 +115,16 @@ class nofollow_library
 	public function config()
 	{
             // A very simple library. No changing APIs (hence, no versions), no variants. Expected to be extracted into
-            // 'e107_web/lib/simple'.
             $libraries['simple_html_dom'] = array(
                     'name'              => 'Simple HTML DOM',
                     'vendor_url'        => 'http://sourceforge.net/projects/simplehtmldom/',
                     'download_url'      => 'https://sourceforge.net/projects/simplehtmldom/files/latest/download',
-                    'library_path'      => '{e_WEB}lib/simple_html_dom',
+                    'library_path'      => '{e_PLUGIN}nofollow/lib/',
                     'version_arguments' => array(
                             'file'    => 'simple_html_dom.php',
                             // Best practice: Document the actual version strings for later reference.
                             // @version 1.5 ($Rev: 196 $)
-                            'pattern' => '/@version (\d+\.+\d+)/',
+                            'pattern' => '/@version\s(\d+\.\d+)/',
                             'lines'   => 40,
                     ),
                     'files' => array(
