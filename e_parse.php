@@ -24,35 +24,34 @@ class nofollow_parse
 
 	/**
 	 * Plugin Preferences
-	 *
 	 * @var array
 	 */
 	private static $Prefs = [];
 	/**
 	 * Operational status
-	 *
 	 * @var boolean
 	 */
 	private static $Active = false;
 	/**
 	 * Exclude/ignore domains
-	 *
 	 * @var array
 	 */
 	private static $excludeDomains = [];
 	/**
 	 * Exclude/ignore pages
-	 *
 	 * @var array
 	 */
 	private static $excludePages = [];
 	/**
 	 * Parsing method used
-	 *
-	 * @var type
+	 * @var string
 	 */
 	private static $parseMethod;
-	private static $filterContext;// todo: implement this
+	/**
+	 * Admin chosen contexts
+	 * @var array
+	 */
+	private static $filterContext;
 
 
 	/**
@@ -60,62 +59,90 @@ class nofollow_parse
 	 */
 	public function __construct()
 	{
-		// todo: make an intitializer method and move all initialization there?
-		// - set plugin prefs
-		self::$Prefs = self::getPrefs();
-		// Begin - set status
-		self::$Active = self::getStatus();
-		// - set exclude pages
-		self::$excludePages = self::getExcludePages();
-		// - set exclude domains
-		self::$excludeDomains = self::getExcludeDomains();
-		// - set parse method
-		self::$parseMethod = self::getParseMethod();
+		$this->init();
+
+	}
+
+	protected function init()
+	{
+		self::setPrefs();
+		self::setStatus();
+		self::setExcludePages();
+		self::setExcludeDomains();
+		self::setParseMethod();
 
 	}
 
 
 	/**
-	 * Retrieve and return plugin preferences
+	 * Sets plugin preferences
 	 *
 	 * @access protected
 	 * @return array associative array of plugin preferences
 	 */
-	protected static function getPrefs()
+	protected static function setPrefs()
 	{
-		return e107::getPlugPref('nofollow');
+		self::$Prefs = e107::getPlugPref('nofollow');
 	}
 
 
 	/**
-	 * Get plugin operation status preference
+	 * Sets plugin operation status preference
 	 *
 	 * @return integer|boolean
 	 */
-	protected static function getStatus()
+	protected static function setStatus()
 	{
-		return self::$Prefs['active'];
-
+		self::$Active = self::$Prefs['active'];
 	}
 
+
+	/**
+	 * Sets exclude pages as a numeric array
+	 *
+	 * @return array
+	 */
+	protected static function setExcludePages()
+	{
+		self::$excludePages = self::nlStringToArray(self::$Prefs['ignore_pages']);
+	}
+
+
+	/**
+	 * Sets NoFollow parse excluded domain names
+	 * @return array | string
+	 */
+	protected static function setExcludeDomains()
+	{
+		self::$excludeDomains = self::solveExcludeDomains();
+	}
+
+
+	/**
+	 * Sets NoFollow parse filter application context
+	 * @return indexed array of admin chosen contexts
+	 */
+	protected static function setFilterContexts()
+	{
+		self::$filterContext = self::$Prefs['filter_context'];
+	}
+
+	/**
+	 * Gets parse method preference
+	 *
+	 * @return string
+	 */
+	protected static function setParseMethod()
+	{
+		self::$parseMethod = trim(self::$Prefs['parse_method']);
+	}
 
 	/**
 	 * Get exclude pages as a numeric array
 	 *
 	 * @return array
 	 */
-	protected static function getExcludePages()
-	{
-		return self::nlStringToArray(self::$Prefs['ignore_pages']);
-	}
-
-
-	/**
-	 * Get exclude pages as a numeric array
-	 *
-	 * @return array
-	 */
-	protected static function getExcludeDomains()
+	protected static function solveExcludeDomains()
 	{
 		if (isset(self::$Prefs['ignore_domains'])) {
 			$domains = self::nlStringToArray(self::$Prefs['ignore_domains']);
@@ -139,17 +166,6 @@ class nofollow_parse
 		$str = str_replace(["\r\n", "\n\r"], "|", $str_with_nl);
 
 		return explode("|", $str);
-	}
-
-
-	/**
-	 * Gets parse method preference
-	 *
-	 * @return string
-	 */
-	protected static function getParseMethod()
-	{
-		return trim(self::$Prefs['parse_method']);
 	}
 
 
@@ -241,7 +257,6 @@ class nofollow_parse
 	protected static function needNoFollow($anchor)
 	{
 		$hrefValue = self::getHrefValue($anchor);
-		// todo: isExcludePage can be implemented in toHtml method
 		if (null === $hrefValue || self::isExcludeDomain($hrefValue)) {
 			return false;
 		}
@@ -299,6 +314,7 @@ class nofollow_parse
 	 * @param $input
 	 *
 	 * @return bool
+	 * TODO revise pattern - is flawed, gives false positive for internal urls
 	 */
 	protected static function isValidExternalUrl($input)
 	{
@@ -444,8 +460,9 @@ class nofollow_parse
 	 */
 	protected static function getContextList()
 	{
-		$pref = e107::getPlugPref('nofollow', 'filter_context');
-		switch ($pref) {
+		//$pref = e107::getPlugPref('nofollow', 'filter_context');
+		$contextPref = self::$filterContext;
+		switch ($contextPref) {
 			case 1:
 				return ['USER_TITLE', 'USER_BODY'];
 				break;
@@ -499,3 +516,4 @@ class nofollow_parse
 
 
 }
+
