@@ -1,9 +1,6 @@
 <?php
-
-// Generated e107 Plugin Admin Area 
-
 require_once('../../class2.php');
-if ( ! getperms('P')) {
+if ( ! getperms('P') || ! e107::isInstalled('nofollow')) {
 	e107::redirect('admin');
 	exit;
 }
@@ -28,12 +25,12 @@ class nofollow_adminArea extends e_admin_dispatcher
 	/**
 	 * Admin Menu
 	 *
-	 * @var type
+	 * @var array
 	 */
 	protected $adminMenu = [
 
 		'main/prefs' => ['caption' => LAN_PREFS, 'perm' => 'P'],
-		'main/help' => array('caption'=> 'Help', 'perm' => 'P')
+		'main/help'  => ['caption' => 'Help', 'perm' => 'P'],
 
 	];
 
@@ -44,7 +41,7 @@ class nofollow_adminArea extends e_admin_dispatcher
 	/**
 	 * Admin Menu title
 	 *
-	 * @var type
+	 * @var string
 	 */
 	protected $menuTitle = LAN_NOFOLLOW_PLUGIN_TITLE;
 }
@@ -53,17 +50,17 @@ class nofollow_adminArea extends e_admin_dispatcher
 class nofollow_ui extends e_admin_ui
 {
 	/**
-	 * @var type
+	 * @var string
 	 */
 	protected $pluginTitle = LAN_NOFOLLOW_PLUGIN_TITLE;
 
 	/**
-	 * @var type
+	 * @var string
 	 */
 	protected $pluginName = 'nofollow';
 
 	/**
-	 * @var type
+	 * @var array
 	 */
 	protected $parseMethods = [
 		'regexHtmlParse_Nofollow'     => LAN_NOFOLLOW_REGEX_PARSER,
@@ -71,13 +68,13 @@ class nofollow_ui extends e_admin_ui
 	];
 
 	protected $filterContexts = [
-		1 => 'User-Posted',
-		2 => 'User-And-Admin-Posted',
-		3 => 'Everything'
+		1 => 'User Posted Only',
+		2 => 'User + Admin Posted',
+		3 => 'Everything',
 	];
 
 	/**
-	 * @var type
+	 * @var array
 	 */
 	protected $fieldpref = [];
 
@@ -89,7 +86,7 @@ class nofollow_ui extends e_admin_ui
 	/**
 	 * Plugin preferences
 	 *
-	 * @var type
+	 * @var array
 	 */
 	protected $prefs = [
 
@@ -99,6 +96,15 @@ class nofollow_ui extends e_admin_ui
 			'type'  => 'boolean',
 			'data'  => 'int',
 			'help'  => LAN_NOFOLLOW_HINT_ACTIVATE,
+		],
+
+		'filter_context' => [
+			'title' => 'What type of content should NoFollow filter be applied to:',
+			'tab'   => 0,
+			'type'  => 'dropdown',
+			'size'  => 'xxlarge',
+			'data'  => 'int',
+			'help'  => 'In what context NoFollow parse filter is called for.',
 		],
 
 		'ignore_pages' => [
@@ -126,14 +132,13 @@ class nofollow_ui extends e_admin_ui
 			'help'  => LAN_NOFOLLOW_HINT_PARSE_METHOD,
 		],
 
-		'filter_context' => [
-			'title' => 'NoFollow Filter Context (For Content)',
+		'use_global_path' => [
+			'title' => 'Use global path for simple dom parser lib',
 			'tab'   => 0,
-			'type'  => 'dropdown',
-			'size'  => 'xxlarge',
+			'type'  => 'boolean',
 			'data'  => 'int',
-			'help'  => 'In what context NoFollow parse filter is called for.',
-		],
+			'help'  => 'Use global path for lib'
+		]
 	];
 
 
@@ -148,6 +153,17 @@ class nofollow_ui extends e_admin_ui
 
 	// ------- Customize Create --------
 
+
+	private function simpleDomParseLibWarning()
+	{
+		$parseMethod = e107::pref('nofollow', 'parse_method');
+		if ($parseMethod === 'simpleHtmlDomParse_Nofollow') {
+			e107::getMessage()
+				->addWarning('You need to install Simple DOM Parse Library to use ' . LAN_NOFOLLOW_SIMPLE_HTML_DOM_PARSER);
+		}
+	}
+
+
 	public function beforeCreate($new_data, $old_data)
 	{
 		return $new_data;
@@ -160,13 +176,14 @@ class nofollow_ui extends e_admin_ui
 	}
 
 
+	// ------- Customize Update --------
+
+
 	public function onCreateError($new_data, $old_data)
 	{
 		// do something
 	}
 
-
-	// ------- Customize Update --------
 
 	public function beforeUpdate($new_data, $old_data, $id)
 	{
@@ -186,15 +203,6 @@ class nofollow_ui extends e_admin_ui
 	}
 
 
-	private function simpleDomParseLibWarning()
-	{
-		$parseMethod = e107::pref('nofollow', 'parse_method');
-		if ($parseMethod === 'simpleHtmlDomParse_Nofollow') {
-			e107::getMessage()
-				->addWarning('You need to install Simple DOM Parse Library to use ' . LAN_NOFOLLOW_SIMPLE_HTML_DOM_PARSER);
-		}
-	}
-
 	public function renderHelp()
 	{
 		$caption = 'Author & Project Info';
@@ -204,16 +212,16 @@ class nofollow_ui extends e_admin_ui
 		$text .= '<br><p>Project link on github: http://github.com/arunshekher/nofollow</p>';
 		$text .= '<p>Author: Arun S. Sekher</p>';
 
-
 		return ['caption' => $caption, 'text' => $text];
 
 	}
+
 
 	public function helpPage()
 	{
 		$ns = e107::getRender();
 		$text = "Hello World!";
-		$ns->tablerender("Hello",$text);
+		$ns->tablerender("Greeting", $text);
 
 	}
 
