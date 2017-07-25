@@ -14,10 +14,11 @@
 		<link url="admin_config.php" description=""  icon='images/nofollow_32.png' iconSmall='images/nofollow_16.png' icon128="images/nofollow_128.png" primary="true" >LAN_CONFIGURE</link>
 	</adminLinks>
 	<pluginPrefs>
-		<pref name='active'>1</pref>
-		<pref name='ignore_pages'></pref>
-		<pref name='ignore_domains'></pref>
-		<pref name='parse_method'>regexHtmlParse_Nofollow</pref>
-		<pref name='filter_context'>1</pref>
+		<pref name="active">1</pref>
+		<pref name="ignore_pages"></pref>
+		<pref name="ignore_domains"></pref>
+		<pref name="parse_method">regexHtmlParse_Nofollow</pref>
+		<pref name="filter_context">1</pref>
+		<pref name="use_global_path">0</pref>
 	</pluginPrefs>
 </e107Plugin>
