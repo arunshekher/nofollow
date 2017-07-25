@@ -379,8 +379,9 @@ abstract class NoFollow
 	{
 		if (self::$Prefs['use_global_path']) {
 			e107::library('load', 'simple_html_dom');
+		} else {
+			require_once __DIR__ . '/lib/simple_html_dom.php';
 		}
-		require_once __DIR__ . '/lib/simple_html_dom.php';
 	}
 
 
@@ -457,8 +458,8 @@ abstract class NoFollow
 				return ['TITLE', 'BODY', 'USER_TITLE', 'USER_BODY'];
 				break;
 			case 3:
+			default:
 				return null;
-				break;
 		}
 	}
 
