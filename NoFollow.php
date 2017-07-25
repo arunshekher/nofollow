@@ -4,32 +4,38 @@
 abstract class NoFollow
 {
 	/**
-	 * Plugin Preferences
-	 * @var array
-	 */
-	private static $Prefs = [];
-	/**
 	 * Operational status
+	 *
 	 * @var boolean
 	 */
 	protected static $Active = false;
 	/**
+	 * Parsing method used
+	 *
+	 * @var string
+	 */
+	protected static $parseMethod;
+	/**
+	 * Plugin Preferences
+	 *
+	 * @var array
+	 */
+	private static $Prefs = [];
+	/**
 	 * Exclude/ignore domains
+	 *
 	 * @var array
 	 */
 	private static $excludeDomains = [];
 	/**
 	 * Exclude/ignore pages
+	 *
 	 * @var array
 	 */
 	private static $excludePages = [];
 	/**
-	 * Parsing method used
-	 * @var string
-	 */
-	protected static $parseMethod;
-	/**
 	 * Admin chosen contexts
+	 *
 	 * @var array
 	 */
 	private static $filterContext;
@@ -44,6 +50,11 @@ abstract class NoFollow
 
 	}
 
+
+	/**
+	 * Initializes class
+	 *
+	 */
 	protected function init()
 	{
 		self::setPrefs();
@@ -85,53 +96,8 @@ abstract class NoFollow
 	 */
 	protected static function setExcludePages()
 	{
-		self::$excludePages = self::nlStringToArray(self::$Prefs['ignore_pages']);
-	}
-
-
-	/**
-	 * Sets NoFollow parse excluded domain names
-	 * @return array | string
-	 */
-	protected static function setExcludeDomains()
-	{
-		self::$excludeDomains = self::solveExcludeDomains();
-	}
-
-
-	/**
-	 * Sets NoFollow parse filter application context
-	 * @return indexed array of admin chosen contexts
-	 */
-	protected static function setFilterContexts()
-	{
-		self::$filterContext = self::$Prefs['filter_context'];
-	}
-
-	/**
-	 * Sets parse method preference
-	 *
-	 * @return string
-	 */
-	protected static function setParseMethod()
-	{
-		self::$parseMethod = trim(self::$Prefs['parse_method']);
-	}
-
-	/**
-	 * Work out exclude domain names
-	 *
-	 * @return array | string
-	 */
-	protected static function solveExcludeDomains()
-	{
-		if (isset(self::$Prefs['ignore_domains'])) {
-			$domains = self::nlStringToArray(self::$Prefs['ignore_domains']);
-			$domains[] = e_DOMAIN;
-			return array_unique($domains);
-		}
-
-		return [e_DOMAIN];
+		self::$excludePages =
+			self::nlStringToArray(self::$Prefs['ignore_pages']);
 	}
 
 
@@ -151,34 +117,53 @@ abstract class NoFollow
 
 
 	/**
-	 * Checks if current/present page matches an exclude page
+	 * Sets NoFollow parse excluded domain names
 	 *
-	 * @todo do an if empty check for excludePages pref
-	 *       exclude pages
-	 * @return boolean
+	 * @return array | string
 	 */
-	protected static function isExcludePage()
+	protected static function setExcludeDomains()
 	{
-		$current_page = e_REQUEST_URI; //$_SERVER['REQUEST_URI']
-		if (count(self::$excludePages)) {
-			foreach (self::$excludePages as $xpage) {
-				if (strpos($current_page, $xpage) !== false) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		self::$excludeDomains = self::solveExcludeDomains();
 	}
 
 
 	/**
-	 * Checks if admin area
-	 * @return bool
+	 * Work out exclude domain names
+	 *
+	 * @return array | string
 	 */
-	protected static function isAdminArea()
+	protected static function solveExcludeDomains()
 	{
-		return e_ADMIN_AREA;
+		if (isset(self::$Prefs['ignore_domains'])) {
+			$domains = self::nlStringToArray(self::$Prefs['ignore_domains']);
+			$domains[] = e_DOMAIN;
+
+			return array_unique($domains);
+		}
+
+		return [e_DOMAIN];
+	}
+
+
+	/**
+	 * Sets parse method preference
+	 *
+	 * @return string
+	 */
+	protected static function setParseMethod()
+	{
+		self::$parseMethod = trim(self::$Prefs['parse_method']);
+	}
+
+
+	/**
+	 * Sets NoFollow parse filter application context
+	 *
+	 * @return indexed array of admin chosen contexts
+	 */
+	protected static function setFilterContexts()
+	{
+		self::$filterContext = self::$Prefs['filter_context'];
 	}
 
 
@@ -201,7 +186,10 @@ abstract class NoFollow
 			PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
 		foreach ($fragments as $fragment) {
-			if (self::isOpeningAnchor($fragment) && self::needNoFollow($fragment)) {
+			if (
+				self::isOpeningAnchor($fragment)
+				&& self::needNoFollow($fragment)
+			) {
 				$nf_text .= self::stampNoFollow($fragment);
 			} else {
 				$nf_text .= $fragment;
@@ -231,6 +219,7 @@ abstract class NoFollow
 
 	/**
 	 * Checks if anchor need NoFollow
+	 *
 	 * @param $anchor
 	 *
 	 * @return bool
@@ -359,10 +348,10 @@ abstract class NoFollow
 
 		foreach ($anchors as $anchor) {
 			if (
-				(string)$anchor->rel === 'nofollow' ||
-				self::isAdminArea() ||
-				self::isExcludePage() ||
-				! self::needNoFollow($anchor)
+				(string)$anchor->rel === 'nofollow'
+				|| self::isAdminArea()
+				|| self::isExcludePage()
+				|| ! self::needNoFollow($anchor)
 			) {
 				continue;
 			}
@@ -384,9 +373,42 @@ abstract class NoFollow
 	}
 
 
+	/**
+	 * Checks if admin area
+	 *
+	 * @return bool
+	 */
+	protected static function isAdminArea()
+	{
+		return e_ADMIN_AREA;
+	}
+
+
+	/**
+	 * Checks if current/present page matches an exclude page
+	 *
+	 * @todo do an if empty check for excludePages pref
+	 *       exclude pages
+	 * @return boolean
+	 */
+	protected static function isExcludePage()
+	{
+		$current_page = e_REQUEST_URI; //$_SERVER['REQUEST_URI']
+		if (count(self::$excludePages)) {
+			foreach (self::$excludePages as $xpage) {
+				if (strpos($current_page, $xpage) !== false) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 
 	/**
 	 * Checks if the currently parsing $text is in NoFollow parse filter context
+	 *
 	 * @param $context
 	 *
 	 * @return bool
@@ -398,14 +420,18 @@ abstract class NoFollow
 			return true;
 		}
 		foreach ($contextList as $contextItem) {
-			if ($contextItem === $context) return true;
+			if ($contextItem === $context) {
+				return true;
+			}
 		}
+
 		return false;
 	}
 
 
 	/**
 	 * Gets context list according to preference
+	 *
 	 * @return array|null
 	 */
 	protected static function getContextList()
@@ -424,20 +450,6 @@ abstract class NoFollow
 				break;
 		}
 	}
-
-	/**
-	 * Debug logger
-	 *
-	 * @param string $content String content that's being passed in as argument
-	 * @param string $logname Optional log file name
-	 */
-	private static function _debugLog($content, $logname = 'Nofollow-Debug')
-	{
-		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
-		file_put_contents($path, $content . "\n", FILE_APPEND);
-		unset($path, $content);
-	}
-
 
 
 	/**
@@ -462,6 +474,20 @@ abstract class NoFollow
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Debug logger
+	 *
+	 * @param string $content String content that's being passed in as argument
+	 * @param string $logname Optional log file name
+	 */
+	private static function _debugLog($content, $logname = 'Nofollow-Debug')
+	{
+		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
+		file_put_contents($path, $content . "\n", FILE_APPEND);
+		unset($path, $content);
 	}
 
 }
