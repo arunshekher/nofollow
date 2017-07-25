@@ -32,7 +32,7 @@ abstract class NoFollow
 	 *
 	 * @var array
 	 */
-	private static $excludePages = [];
+	private static $excludePages;
 	/**
 	 * Admin chosen contexts
 	 *
@@ -69,8 +69,6 @@ abstract class NoFollow
 	/**
 	 * Sets plugin preferences
 	 *
-	 * @access protected
-	 * @return array associative array of plugin preferences
 	 */
 	protected static function setPrefs()
 	{
@@ -81,7 +79,6 @@ abstract class NoFollow
 	/**
 	 * Sets plugin operation status preference
 	 *
-	 * @return integer|boolean
 	 */
 	protected static function setStatus()
 	{
@@ -92,7 +89,6 @@ abstract class NoFollow
 	/**
 	 * Sets exclude pages as a numeric array
 	 *
-	 * @return array
 	 */
 	protected static function setExcludePages()
 	{
@@ -102,9 +98,9 @@ abstract class NoFollow
 
 
 	/**
-	 * Helper method - Converts newline delimited string to numeric array
+	 * Converts newline delimited string to numeric array
 	 *
-	 * @param type $str_with_nl
+	 * @param string $str_with_nl
 	 *
 	 * @return array
 	 */
@@ -159,7 +155,7 @@ abstract class NoFollow
 	/**
 	 * Sets NoFollow parse filter application context
 	 *
-	 * @return indexed array of admin chosen contexts
+	 * @return array of admin chosen contexts
 	 */
 	protected static function setFilterContexts()
 	{
@@ -209,7 +205,10 @@ abstract class NoFollow
 	 */
 	protected static function isOpeningAnchor($fragment)
 	{
-		if (stripos($fragment, '<a') !== false && ! strpos($fragment, '<a')) {
+		if (
+			stripos($fragment, '<a') !== false
+			&& ! strpos($fragment, '<a')
+		) {
 			return true;
 		}
 
@@ -336,11 +335,11 @@ abstract class NoFollow
 	 *
 	 * @return string - Parsed $text
 	 * @access protected
+	 * TODO implement local and global loading.
 	 */
 	protected static function simpleHtmlDomParse_Nofollow($text)
 	{
-		require_once __DIR__ . '/lib/simple_html_dom.php';
-		//e107::library('load', 'simple_html_dom');
+		self::resolveLibPath();
 
 		$dom = new simple_html_dom;
 		$dom->load($text);
@@ -374,6 +373,18 @@ abstract class NoFollow
 
 
 	/**
+	 * Resolve simple dom parser class path based on admin pref.
+	 */
+	protected static function resolveLibPath()
+	{
+		if (self::$Prefs['use_global_path']) {
+			e107::library('load', 'simple_html_dom');
+		}
+		require_once __DIR__ . '/lib/simple_html_dom.php';
+	}
+
+
+	/**
 	 * Checks if admin area
 	 *
 	 * @return bool
@@ -394,7 +405,7 @@ abstract class NoFollow
 	protected static function isExcludePage()
 	{
 		$current_page = e_REQUEST_URI; //$_SERVER['REQUEST_URI']
-		if (count(self::$excludePages)) {
+		if (count(self::$excludePages) > 0) {
 			foreach (self::$excludePages as $xpage) {
 				if (strpos($current_page, $xpage) !== false) {
 					return true;
@@ -436,8 +447,8 @@ abstract class NoFollow
 	 */
 	protected static function getContextList()
 	{
-		//$pref = e107::getPlugPref('nofollow', 'filter_context');
 		$contextPref = self::$filterContext;
+
 		switch ($contextPref) {
 			case 1:
 				return ['USER_TITLE', 'USER_BODY'];
@@ -464,8 +475,7 @@ abstract class NoFollow
 		$excludes = self::$excludeDomains;
 
 		$href = self::getHrefValue($anchor);
-		// todo: check here if href has an http:// https:// prefix  or a domain name if not return false.
-		if (null !== $href && self::isValidExternalUrl($href)) { // todo: and notExclude domain need nofollow
+		if (null !== $href && self::isValidExternalUrl($href)) {
 			foreach ($excludes as $exclude) {
 				if (strpos($href, $exclude) !== false) {
 					return true;
@@ -480,8 +490,8 @@ abstract class NoFollow
 	/**
 	 * Debug logger
 	 *
-	 * @param string $content String content that's being passed in as argument
-	 * @param string $logname Optional log file name
+	 * @param string $content - content to log
+	 * @param string $logname - optional log name
 	 */
 	private static function _debugLog($content, $logname = 'Nofollow-Debug')
 	{
