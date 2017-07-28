@@ -81,7 +81,7 @@ class nofollow_ui extends e_admin_ui
 	/**
 	 *
 	 */
-	//protected $preftabs = array('General Settings', 'Manage Exclusions', 'Manage Parse Method' );
+	protected $preftabs = array('Main', 'Manage Exclusions');
 
 	/**
 	 * Plugin preferences
@@ -109,7 +109,7 @@ class nofollow_ui extends e_admin_ui
 
 		'ignore_pages' => [
 			'title' => LAN_NOFOLLOW_EXCLUDE_PAGES,
-			'tab'   => 0,
+			'tab'   => 1,
 			'type'  => 'textarea',
 			'data'  => 'str',
 			'help'  => LAN_NOFOLLOW_HINT_EXCLUDE_PAGES,
@@ -117,7 +117,7 @@ class nofollow_ui extends e_admin_ui
 
 		'ignore_domains' => [
 			'title' => LAN_NOFOLLOW_EXCLUDE_DOMAINS,
-			'tab'   => 0,
+			'tab'   => 1,
 			'type'  => 'textarea',
 			'data'  => 'str',
 			'help'  => LAN_NOFOLLOW_HINT_EXCLUDE_DOMAINS,
@@ -146,22 +146,11 @@ class nofollow_ui extends e_admin_ui
 	{
 		$this->prefs['parse_method']['writeParms'] = $this->parseMethods;
 		$this->prefs['filter_context']['writeParms'] = $this->filterContexts;
-		$this->simpleDomParseLibWarning();
 
 	}
 
 
 	// ------- Customize Create --------
-
-
-	private function simpleDomParseLibWarning()
-	{
-		$parseMethod = e107::pref('nofollow', 'parse_method');
-		if ($parseMethod === 'simpleHtmlDomParse_Nofollow') {
-			e107::getMessage()
-				->addWarning('You need to install Simple DOM Parse Library to use ' . LAN_NOFOLLOW_SIMPLE_HTML_DOM_PARSER);
-		}
-	}
 
 
 	public function beforeCreate($new_data, $old_data)
