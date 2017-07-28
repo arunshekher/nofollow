@@ -287,10 +287,12 @@ abstract class NoFollow
 	 */
 	protected static function isValidExternalUrl($input)
 	{
-		$url_pattern =
-			'/((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+'
-			. '\.([a-zA-Z0-9\&\.\/\?\:@\-_=#]){2,}/';
-		if (preg_match($url_pattern, trim($input))) {
+		$pattern = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+'
+		    . '[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.'
+			. '[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.'
+			. '[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})';
+
+		if (preg_match($pattern, trim($input))) {
 			return true;
 		}
 
@@ -315,8 +317,7 @@ abstract class NoFollow
 
 		if (strpos($anchor, 'rel')) {
 			$pattern = "/rel=([\"'])([^\\1]+?)\\1/";
-			//$replace = "rel=\\1\\2 nofollow\\1";
-			$replace = "rel=\\1\\2 nofollow\\1 target=\"_blank\"";
+			$replace = "rel=\\1nofollow \\2\\1 target=\"_blank\"";
 
 			return preg_replace($pattern, $replace, $anchor);
 		} else {
@@ -358,7 +359,7 @@ abstract class NoFollow
 						'nofollow') === false) && strpos((string)$anchor->rel,
 					'external') !== false
 			) {
-				$anchor->rel = 'nofollow';
+				$anchor->rel = 'nofollow external';
 				$anchor->target = '_blank';
 			} else {
 				$anchor->rel = 'nofollow';
