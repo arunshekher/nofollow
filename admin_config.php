@@ -196,10 +196,17 @@ class nofollow_ui extends e_admin_ui
 	{
 		$caption = 'Project Info';
 		$text = '<div style="text-align: center">
-					<img src="images/nofollow.svg" alt="Nofollow" width="128" height="128">
+					<img src="http://localhost/projectlogo/public/project/nofollow/svg/128" alt="Nofollow" width="128" height="128">
 				</div>';
-		$text .= '<br><p>Project link on github: http://github.com/arunshekher/nofollow</p>';
-		$text .= '<p>Author: Arun S. Sekher</p>';
+		$text .= '<br><h5>Project repo at Github:</h5>';
+		$text .= '<p><kbd><a href="http://github.com/arunshekher/nofollow">http://github.com/arunshekher/nofollow</a></kbd></p>';
+		$text .= '<a class="github-button" href="https://github.com/arunshekher/mentions/subscription" data-icon="octicon-eye" aria-label="Watch arunshekher/mentions on GitHub">Watch</a>
+					<a class="github-button" href="https://github.com/arunshekher/mentions" data-icon="octicon-star" aria-label="Star arunshekher/mentions on GitHub">Star</a>
+					<a class="github-button" href="https://github.com/arunshekher/mentions/issues" data-icon="octicon-issue-opened" aria-label="Issue arunshekher/mentions on GitHub">Issue</a>';
+		$text .= '<h5>Developer:</h5>';
+		$text .= '<p><small>Arun S. Sekher</small></p>';
+		$text .= '<a class="github-button" href="https://github.com/arunshekher" aria-label="Follow @arunshekher on GitHub">Follow</a>';
+		$text .= '<script async defer src="https://buttons.github.io/buttons.js"></script>';
 
 		return ['caption' => $caption, 'text' => $text];
 
@@ -209,8 +216,8 @@ class nofollow_ui extends e_admin_ui
 	public function helpPage()
 	{
 		$ns = e107::getRender();
-		$text = "Hello World!";
-		$ns->tablerender("Greeting", $text);
+		$text = "Nothing yet!";
+		$ns->tablerender("Help", $text);
 
 	}
 
