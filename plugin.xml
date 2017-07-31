@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e107Plugin name="Nofollow" lan="LAN_NOFOLLOW_PLUGIN_TITLE" version="1.3" date="2017-01-13" compatibility="2.0" installRequired="true" >
+<e107Plugin name="Nofollow" lan="LAN_NOFOLLOW_PLUGIN_TITLE" version="1.3.0" date="2017-01-13" compatibility="2.0" installRequired="true" >
 	<author name="Arun S. Sekher" url="https://github.com/arunshekher" />
 	<summary lan="">An SEO oriented plugin aimed to discourage Dofollow backlink building SPAM in e107 powered websites.</summary>
 	<description lan="">An SEO oriented plugin to insert rel=&#34;nofollow&#34; attribute to URLs posted on your e107 website with options on per URL basis.</description>
