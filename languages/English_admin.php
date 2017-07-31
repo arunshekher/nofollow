@@ -2,6 +2,10 @@
 define('LAN_NOFOLLOW_SIMPLE_HTML_DOM_PARSER', 'Simple HTML DOM Parse Method');
 define('LAN_NOFOLLOW_REGEX_PARSER', 'RegEx Parse Method');
 
+define('LAN_NOFOLLOW_PREF_VAL_CONTEXT_USER', 'User Posted Only');
+define('LAN_NOFOLLOW_PREF_VAL_CONTEXT_USER_ADMIN', 'User + Admin Posted');
+define('LAN_NOFOLLOW_PREF_VAL_CONTEXT_EVERYTHING', 'Everything');
+
 define('LAN_NOFOLLOW_ACTIVATE', 'Activate NoFollow?');
 define('LAN_NOFOLLOW_ONPOST_ACTIVATE', 'Activate &#39;NoFollow Onpost&#39;?');
 define('LAN_NOFOLLOW_EXCLUDE_PAGES', 'Exclude Pages: ');

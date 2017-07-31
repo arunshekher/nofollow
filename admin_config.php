@@ -68,9 +68,9 @@ class nofollow_ui extends e_admin_ui
 	];
 
 	protected $filterContexts = [
-		1 => 'User Posted Only',
-		2 => 'User + Admin Posted',
-		3 => 'Everything',
+		1 => LAN_NOFOLLOW_PREF_VAL_CONTEXT_USER,
+		2 => LAN_NOFOLLOW_PREF_VAL_CONTEXT_USER_ADMIN,
+		3 => LAN_NOFOLLOW_PREF_VAL_CONTEXT_EVERYTHING,
 	];
 
 	/**
