@@ -81,7 +81,7 @@ class nofollow_ui extends e_admin_ui
 	/**
 	 *
 	 */
-	protected $preftabs = ['Main', 'Manage Exclusions'];
+	protected $preftabs = [LAN_NOFOLLOW_PREF_TAB_MAIN, LAN_NOFOLLOW_PREF_TAB_EXCLUSIONS];
 
 	/**
 	 * Plugin preferences
@@ -99,12 +99,12 @@ class nofollow_ui extends e_admin_ui
 		],
 
 		'filter_context' => [
-			'title' => 'What type of content should NoFollow filter be applied to:',
+			'title' => LAN_NOFOLLOW_CONTEXT,
 			'tab'   => 0,
 			'type'  => 'dropdown',
 			'size'  => 'xxlarge',
 			'data'  => 'int',
-			'help'  => 'In what context NoFollow parse filter is called for.',
+			'help'  => LAN_NOFOLLOW_HINT_CONTEXT,
 		],
 
 		'ignore_pages' => [
@@ -133,11 +133,11 @@ class nofollow_ui extends e_admin_ui
 		],
 
 		'use_global_path' => [
-			'title' => 'Use global path for simple dom parser lib',
+			'title' => LAN_NOFOLLOW_GLOBAL_LIB,
 			'tab'   => 0,
 			'type'  => 'boolean',
 			'data'  => 'int',
-			'help'  => 'Use global path for lib',
+			'help'  => LAN_NOFOLLOW_HINT_GLOBAL_LIB,
 		],
 	];
 
