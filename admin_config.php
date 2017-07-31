@@ -152,19 +152,17 @@ class nofollow_ui extends e_admin_ui
 
 	public function renderHelp()
 	{
-		$caption = 'Project Info';
-		$text = '<div style="text-align: center">
-					<img src="http://www.e107.space/projects/nofollow/svg" alt="Nofollow" width="128" height="128">
-				</div>';
-		$text .= '<br><h5>Project repo on Github:</h5>';
-		$text .= '<p><kbd style="word-wrap: break-word"><a href="http://github.com/arunshekher/nofollow">http://github.com/arunshekher/nofollow</a></kbd></p>';
-		$text .= '<a class="github-button" href="https://github.com/arunshekher/nofollow/subscription" data-icon="octicon-eye" aria-label="Watch arunshekher/nofollow on GitHub">Watch</a>
-					<a class="github-button" href="https://github.com/arunshekher/nofollow" data-icon="octicon-star" aria-label="Star arunshekher/nofollow on GitHub">Star</a>
-					<a class="github-button" href="https://github.com/arunshekher/nofollow/issues" data-icon="octicon-issue-opened" aria-label="Issue arunshekher/nofollow on GitHub">Issue</a>';
-		$text .= '<h5>Developer:</h5>';
-		$text .= '<p><small>Arun S. Sekher</small></p>';
-		$text .= '<a class="github-button" href="https://github.com/arunshekher" aria-label="Follow @arunshekher on GitHub">Follow</a>';
-		$text .= '<script async defer src="https://buttons.github.io/buttons.js"></script>';
+		$caption = LAN_NOFOLLOW_INFO_MENU_TITLE;
+		$text = LAN_NOFOLLOW_INFO_MENU_LOGO;
+		$text .= LAN_NOFOLLOW_INFO_MENU_SUBTITLE_GITHUB;
+		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_URL;
+		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_WATCH;
+		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_STAR;
+		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_ISSUE;
+		$text .= LAN_NOFOLLOW_INFO_MENU_SUBTITLE_DEV;
+		$text .= LAN_NOFOLLOW_INFO_MENU_DEV;
+		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_FOLLOW;
+		$text .= LAN_NOFOLLOW_INFO_MENU_GITHUB_BUTTONS_SCRIPT;
 
 		return ['caption' => $caption, 'text' => $text];
 
