@@ -30,7 +30,7 @@ class nofollow_adminArea extends e_admin_dispatcher
 	protected $adminMenu = [
 
 		'main/prefs' => ['caption' => LAN_PREFS, 'perm' => 'P'],
-		'main/help'  => ['caption' => 'Help', 'perm' => 'P'],
+		'main/help'  => ['caption' => LAN_NOFOLLOW_HELP_PAGE_CAPTION, 'perm' => 'P'],
 
 	];
 
@@ -172,8 +172,8 @@ class nofollow_ui extends e_admin_ui
 	public function helpPage()
 	{
 		$ns = e107::getRender();
-		$text = "Nothing yet!";
-		$ns->tablerender("Help", $text);
+		$text = 'Nothing yet!';
+		$ns->tablerender(LAN_NOFOLLOW_HELP_PAGE_CAPTION, $text);
 
 	}
 

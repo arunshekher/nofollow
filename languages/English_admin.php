@@ -35,3 +35,5 @@ define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_WATCH', '<a class="github-button" hre
 define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_STAR', ' <a class="github-button" href="https://github.com/arunshekher/nofollow" data-icon="octicon-star" aria-label="Star arunshekher/nofollow on GitHub">Star</a>');
 define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_ISSUE', ' <a class="github-button" href="https://github.com/arunshekher/nofollow/issues" data-icon="octicon-issue-opened" aria-label="Issue arunshekher/nofollow on GitHub">Issue</a>');
 
+define('LAN_NOFOLLOW_HELP_PAGE_CAPTION', 'Help');
+
