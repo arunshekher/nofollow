@@ -283,7 +283,7 @@ abstract class NoFollow
 	 * @param $input
 	 *
 	 * @return bool
-	 * TODO revise pattern - is flawed, gives false positive for internal urls
+	 * TODO revise pattern
 	 */
 	protected static function isValidExternalUrl($input)
 	{
