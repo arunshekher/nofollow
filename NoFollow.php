@@ -66,7 +66,7 @@ abstract class NoFollow
 
 
 	/**
-	 * Sets plugin preferences
+	 * Sets NoFollow::$Prefs - plugin preferences
 	 *
 	 */
 	protected function setPrefs()
@@ -77,7 +77,7 @@ abstract class NoFollow
 
 
 	/**
-	 * Sets plugin operation status preference
+	 * Sets NoFollow::$Active - based on the plugin preference 'active'
 	 *
 	 */
 	protected function setStatus()
@@ -88,7 +88,8 @@ abstract class NoFollow
 
 
 	/**
-	 * Sets exclude pages as a numeric array
+	 * Sets NoFollow::$excludePages - based on the plugin
+	 *  - preference 'ignore_pages'
 	 *
 	 */
 	protected function setExcludePages()
@@ -102,20 +103,21 @@ abstract class NoFollow
 	/**
 	 * Converts newline delimited string to numeric array
 	 *
-	 * @param string $str_with_nl
-	 *
+	 * @param string $inputString
+	 *  String that needs to be converted
 	 * @return array
+	 *  Array created from string delimited with newlines
 	 */
-	protected function nlStringToArray($str_with_nl)
+	protected function nlStringToArray($inputString)
 	{
-		$str = str_replace(["\r\n", "\n\r"], "|", $str_with_nl);
+		$str = str_replace(["\r\n", "\n\r"], "|", $inputString);
 
 		return explode("|", $str);
 	}
 
 
 	/**
-	 * Sets NoFollow parse excluded domain names
+	 * Sets NoFollow::$excludeDomains
 	 *
 	 */
 	protected function setExcludeDomains()
@@ -126,14 +128,16 @@ abstract class NoFollow
 
 
 	/**
-	 * Work out exclude domain names
+	 * Work out domain names that needs to be excluded
 	 *
-	 * @return array | string
+	 * @return array
+	 *  Array of all the domain names that needs to be excluded.
 	 */
 	protected function solveExcludeDomains()
 	{
 		if (isset($this->Prefs['ignore_domains'])) {
 			$domains = $this->nlStringToArray($this->Prefs['ignore_domains']);
+			// add current domain name too to the list
 			$domains[] = e_DOMAIN;
 
 			return array_unique($domains);
@@ -144,7 +148,8 @@ abstract class NoFollow
 
 
 	/**
-	 * Sets parse method preference
+	 * Sets NoFollow::$parseMethod - based on plugin
+	 *  - preference 'parse_method'
 	 *
 	 */
 	protected function setParseMethod()
@@ -155,9 +160,9 @@ abstract class NoFollow
 
 
 	/**
-	 * Sets NoFollow parse filter application context
+	 * Sets NoFollow::$filterContext - based on the plugin
+	 *  - preference 'filter_context'
 	 *
-	 * @return array of admin chosen contexts
 	 */
 	protected function setFilterContexts()
 	{
@@ -167,13 +172,13 @@ abstract class NoFollow
 
 	/**
 	 * Splits up $text by HTML tags and inner text scan for anchor tags and
-	 * apply 'nofollow' to 'suitable' anchor tag candidates
-	 * (adopted from linkwords plugin.)
+	 *  - apply 'nofollow' to 'suitable' anchor tag candidates (adopted from
+	 *  - linkwords plugin.)
 	 *
 	 * @param string $text
-	 *
-	 * @return string Modified text
-	 * @access protected
+	 *  Text to be parsed
+	 * @return string
+	 *  Amended text
 	 */
 	protected function regexHtmlParse_Nofollow($text)
 	{
@@ -201,29 +206,34 @@ abstract class NoFollow
 	/**
 	 * Tells if the text fragment is an opening anchor tag
 	 *
-	 * @param $fragment
-	 *
+	 * @param string $fragment
+	 *  String to be checked
 	 * @return bool
+	 *  'True' if it is 'false' if it isn't.
 	 */
 	protected function isOpeningAnchor($fragment)
 	{
-		if (
-			stripos($fragment, '<a') !== false
-			&& ! strpos($fragment, '<a')
-		) {
-			return true;
-		}
-
-		return false;
+//		if (
+//			stripos($fragment, '<a') !== false
+//			&& ! strpos($fragment, '<a')
+//		) {
+//			return true;
+//		}
+//
+//		return false;
+		return stripos($fragment, '<a') !== false && ! strpos($fragment, '<a');
 	}
 
 
 	/**
-	 * Checks if anchor need NoFollow
+	 * Checks if anchor need NoFollow based on criteria such as has a
+	 *  - destination URL, destination URL has an excluded domain name
+	 *  - is a valid external URL
 	 *
-	 * @param $anchor
-	 *
+	 * @param string $anchor
+	 *  Anchor tag to be checked
 	 * @return bool
+	 *  'True' if it require nofollow 'false' if it doesn't.
 	 */
 	protected function needNoFollow($anchor)
 	{
@@ -244,8 +254,9 @@ abstract class NoFollow
 	 * Returns the href attribute value of an anchor tag
 	 *
 	 * @param string $anchor
-	 *
-	 * @return string href attribute value | null
+	 *  Anchor tag whose 'href' value/destination URL has to be extracted.
+	 * @return string
+	 *  'href' attribute value | null
 	 */
 	protected function getHrefValue($anchor)
 	{
@@ -263,9 +274,10 @@ abstract class NoFollow
 	/**
 	 * Checks if given URL string is in the excluded domains list
 	 *
-	 * @param $input
-	 *
+	 * @param string $input
+	 *  String to be checked
 	 * @return bool
+	 *  'True' if it is an excluded domain 'false' if not.
 	 */
 	protected function isExcludeDomain($input)
 	{
@@ -282,10 +294,11 @@ abstract class NoFollow
 	/**
 	 * Checks if given string is a valid URL
 	 *
-	 * @param $input
+	 * @param string $input
 	 *
 	 * @return bool
-	 * TODO revise pattern
+	 *  'True' if it is a valid destination URL
+	 * @todo: revise pattern
 	 */
 	protected function isValidExternalUrl($input)
 	{
@@ -303,13 +316,16 @@ abstract class NoFollow
 
 
 	/**
-	 * Helper method - for regexHtmlParse_Nofollow Add rel="nofollow" attribute
-	 * to HTML anchor elements if not present.
+	 * Adds rel="nofollow" attribute to HTML anchor elements if not present,
+	 *  - appends 'nofollow' to the value of rel attrubute if its present but
+	 *  - no nofollow value in it and return the string unaltered if already
+	 *  -  has nofollow.
 	 *
-	 * @param $anchor - string opening anchor tag
+	 * @param string $anchor
+	 *  Opening anchor tag string
 	 *
 	 * @return string
-	 * @access protected
+	 *  Nofollow parsed opening anchor tag
 	 */
 	protected function stampNoFollow($anchor)
 	{
@@ -331,17 +347,17 @@ abstract class NoFollow
 
 
 	/**
-	 * Nofollow DOM parser method using simple_html_dom.php library
+	 * Does Nofollow parsing using simple_html_dom.php library
 	 *
-	 * @param string - $text
+	 * @param string $text
+	 *  The text to be parsed
 	 *
-	 * @return string - Parsed $text
-	 * @access protected
-	 * TODO implement local and global loading.
+	 * @return string $text
+	 *  Nofollow parsed text
 	 */
 	protected function simpleHtmlDomParse_Nofollow($text)
 	{
-		$this->loadLib();
+		$this->loadSimpleHtmlDomParserClass();
 
 		$dom = new simple_html_dom;
 		$dom->load($text);
@@ -375,9 +391,10 @@ abstract class NoFollow
 
 
 	/**
-	 * Resolve simple dom parser class path based on admin pref.
+	 * Load 'simple dom parser class' based on admin pref
+	 *  - global or local scope
 	 */
-	protected function loadLib()
+	protected function loadSimpleHtmlDomParserClass()
 	{
 		if ($this->Prefs['use_global_path']) {
 			e107::library('load', 'simple_html_dom');
@@ -399,11 +416,11 @@ abstract class NoFollow
 
 
 	/**
-	 * Checks if current/present page matches an exclude page
+	 * Checks if currently parsing page matches an exclude page
 	 *
 	 * @todo do an if empty check for excludePages pref
-	 *       exclude pages
 	 * @return boolean
+	 *  'True' if yes 'false' if no
 	 */
 	protected function isExcludePage()
 	{
@@ -421,7 +438,8 @@ abstract class NoFollow
 
 
 	/**
-	 * Checks if the currently parsing $text is in NoFollow parse filter context
+	 * Checks if the currently parsing $text is in NoFollow plugin's
+	 *  - parse filter context
 	 *
 	 * @param $context
 	 *
@@ -444,9 +462,10 @@ abstract class NoFollow
 
 
 	/**
-	 * Gets context list according to preference
+	 * Gets the content context preference translated to e107 specification
 	 *
 	 * @return array|null
+	 *  Content context array or null
 	 */
 	protected function getContextList()
 	{
@@ -467,11 +486,14 @@ abstract class NoFollow
 
 
 	/**
-	 * Checks if the anchor tag URL is an excluded domain
+	 * Checks if the anchor tag's destination URL (href value)
+	 *  - is an excluded domain
 	 *
 	 * @param string $anchor
+	 *  The hyperlink anchor tag to be checked
 	 *
 	 * @return boolean
+	 *  'True' if it is an excluded domain 'false' otherwise.
 	 */
 	protected function hasExcludeDomain($anchor)
 	{
@@ -493,12 +515,17 @@ abstract class NoFollow
 	/**
 	 * Debug logger
 	 *
-	 * @param string $content - content to log
-	 * @param string $logname - optional log name
+	 * @param string $content
+	 *  Content to log
+	 * @param string|array $logname
+	 *  Optional log name
 	 */
-	private static function _debugLog($content, $logname = 'Nofollow-Debug')
+	private static function d($content, $logname = 'Nofollow-Debug')
 	{
 		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
+		if (is_array($content)) {
+			$content = var_export($content, true);
+		}
 		file_put_contents($path, $content . "\n", FILE_APPEND);
 		unset($path, $content);
 	}
