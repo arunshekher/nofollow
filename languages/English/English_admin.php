@@ -24,16 +24,12 @@ define('LAN_NOFOLLOW_HINT_CONTEXT', 'In what context NoFollow parse filter is ca
 define('LAN_NOFOLLOW_HINT_GLOBAL_LIB', 'Use global path for lib');
 
 define('LAN_NOFOLLOW_INFO_MENU_TITLE', 'Project Info');
-define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_GITHUB', '<br><h5>Project repo on GitHub:</h5>');
-define('LAN_NOFOLLOW_INFO_MENU_LOGO', '<div style="text-align: center"><img src="http://www.e107.space/projects/nofollow/svg" alt="Nofollow" width="128" height="128"></div>');
-define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_DEV', '<h5>Developer:</h5>');
-define('LAN_NOFOLLOW_INFO_MENU_DEV', '<p><small>Arun S. Sekher</small></p>');
-define('LAN_NOFOLLOW_INFO_MENU_GITHUB_BUTTONS_SCRIPT', '<script async defer src="https://buttons.github.io/buttons.js"></script>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_FOLLOW', '<a class="github-button" href="https://github.com/arunshekher" aria-label="Follow @arunshekher on GitHub">Follow</a>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_URL', '<p><kbd style="word-wrap: break-word"><a href="http://github.com/arunshekher/nofollow" target="_blank">http://github.com/arunshekher/nofollow</a></kbd></p>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_WATCH', '<a class="github-button" href="https://github.com/arunshekher/nofollow/subscription" data-icon="octicon-eye" aria-label="Watch arunshekher/nofollow on GitHub">Watch</a>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_STAR', ' <a class="github-button" href="https://github.com/arunshekher/nofollow" data-icon="octicon-star" aria-label="Star arunshekher/nofollow on GitHub">Star</a>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_ISSUE', ' <a class="github-button" href="https://github.com/arunshekher/nofollow/issues" data-icon="octicon-issue-opened" aria-label="Issue arunshekher/nofollow on GitHub">Issue</a>');
+define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_GITHUB', 'Project on GitHub');
+define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_ISSUES', 'Report Issues:');
+define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_DEV', 'Thank the Developer!');
+define('LAN_NOFOLLOW_INFO_MENU_DEV', 'Arun S. Sekher');
+define('LAN_NOFOLLOW_INFO_MENU_SUPPORT_DEV_TEXT', 'If you enjoy this plugin, please consider supporting what I do.');
+define('LAN_NOFOLLOW_INFO_MENU_SUPPORT_DEV_TEXT_SIGN', '"Thank you" &mdash; Arun');
 
 define('LAN_NOFOLLOW_HELP_PAGE_CAPTION', 'Help');
 

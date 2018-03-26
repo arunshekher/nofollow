@@ -152,20 +152,13 @@ class nofollow_ui extends e_admin_ui
 
 	public function renderHelp()
 	{
-		$caption = LAN_NOFOLLOW_INFO_MENU_TITLE;
-		$text = LAN_NOFOLLOW_INFO_MENU_LOGO;
-		$text .= LAN_NOFOLLOW_INFO_MENU_SUBTITLE_GITHUB;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_URL;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_WATCH;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_STAR;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_ISSUE;
-		$text .= LAN_NOFOLLOW_INFO_MENU_SUBTITLE_DEV;
-		$text .= LAN_NOFOLLOW_INFO_MENU_DEV;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_FOLLOW;
-		$text .= LAN_NOFOLLOW_INFO_MENU_GITHUB_BUTTONS_SCRIPT;
+		$template = e107::getTemplate('nofollow', 'project_info_menu');
+		$text = e107::getParser()->parseTemplate($template['content'], false);
 
-		return ['caption' => $caption, 'text' => $text];
-
+		return [
+			'caption' => LAN_NOFOLLOW_INFO_MENU_TITLE,
+			'text' => $text
+		];
 	}
 
 
