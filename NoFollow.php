@@ -335,12 +335,12 @@ abstract class NoFollow
 
 		if (strpos($anchor, 'rel')) {
 			$pattern = "/rel=([\"'])([^\\1]+?)\\1/";
-			$replace = "rel=\\1nofollow \\2\\1 target=\"_blank\"";
+			$replace = 'rel=\\1nofollow \\2\\1 target="_blank"';
 
 			return preg_replace($pattern, $replace, $anchor);
 		}
-		$pattern = "/<a /";
-		$replace = "<a rel=\"nofollow\" ";
+		$pattern = '/<a /';
+		$replace = '<a rel="nofollow" target="_blank"';
 
 		return preg_replace($pattern, $replace, $anchor);
 	}
@@ -380,6 +380,7 @@ abstract class NoFollow
 				$anchor->target = '_blank';
 			} else {
 				$anchor->rel = 'nofollow';
+				$anchor->target = '_blank';
 			}
 		}
 
