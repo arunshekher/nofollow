@@ -213,14 +213,6 @@ abstract class NoFollow
 	 */
 	protected function isOpeningAnchor($fragment)
 	{
-//		if (
-//			stripos($fragment, '<a') !== false
-//			&& ! strpos($fragment, '<a')
-//		) {
-//			return true;
-//		}
-//
-//		return false;
 		return stripos($fragment, '<a') !== false && ! strpos($fragment, '<a');
 	}
 
