@@ -99,7 +99,7 @@ class nofollow_ui extends e_admin_ui
 		],
 
 		'filter_context' => [
-			'title' => LAN_NOFOLLOW_CONTEXT,
+			'title' => '',
 			'tab'   => 0,
 			'type'  => 'dropdown',
 			'size'  => 'xxlarge',
@@ -108,7 +108,7 @@ class nofollow_ui extends e_admin_ui
 		],
 
 		'ignore_pages' => [
-			'title' => LAN_NOFOLLOW_EXCLUDE_PAGES,
+			'title' => '',
 			'tab'   => 1,
 			'type'  => 'textarea',
 			'data'  => 'str',
@@ -116,7 +116,7 @@ class nofollow_ui extends e_admin_ui
 		],
 
 		'ignore_domains' => [
-			'title' => LAN_NOFOLLOW_EXCLUDE_DOMAINS,
+			'title' => '',
 			'tab'   => 1,
 			'type'  => 'textarea',
 			'data'  => 'str',
@@ -124,7 +124,7 @@ class nofollow_ui extends e_admin_ui
 		],
 
 		'parse_method' => [
-			'title' => LAN_NOFOLLOW_PARSE_METHOD_TO_USE,
+			'title' => '',
 			'tab'   => 0,
 			'type'  => 'dropdown',
 			'size'  => 'xxlarge',
@@ -133,7 +133,7 @@ class nofollow_ui extends e_admin_ui
 		],
 
 		'use_global_path' => [
-			'title' => LAN_NOFOLLOW_GLOBAL_LIB,
+			'title' => '',
 			'tab'   => 0,
 			'type'  => 'boolean',
 			'data'  => 'int',
@@ -147,25 +147,38 @@ class nofollow_ui extends e_admin_ui
 		$this->prefs['parse_method']['writeParms'] = $this->parseMethods;
 		$this->prefs['filter_context']['writeParms'] = $this->filterContexts;
 
+
+		// Parse LAN constants
+		$this->prefs['filter_context']['title'] =
+			$this->parseLAN(LAN_NOFOLLOW_CONTEXT);
+		$this->prefs['use_global_path']['title'] =
+			$this->parseLAN(LAN_NOFOLLOW_GLOBAL_LIB);
+		$this->prefs['parse_method']['title'] =
+			$this->parseLAN(LAN_NOFOLLOW_PARSE_METHOD);
+		$this->prefs['ignore_pages']['title'] =
+			$this->parseLAN(LAN_NOFOLLOW_EXCLUDE_PAGES);
+		$this->prefs['ignore_domains']['title'] =
+			$this->parseLAN(LAN_NOFOLLOW_EXCLUDE_DOMAINS);
+
 	}
 
 
 	public function renderHelp()
 	{
-		$caption = LAN_NOFOLLOW_INFO_MENU_TITLE;
-		$text = LAN_NOFOLLOW_INFO_MENU_LOGO;
-		$text .= LAN_NOFOLLOW_INFO_MENU_SUBTITLE_GITHUB;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_URL;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_WATCH;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_STAR;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_ISSUE;
-		$text .= LAN_NOFOLLOW_INFO_MENU_SUBTITLE_DEV;
-		$text .= LAN_NOFOLLOW_INFO_MENU_DEV;
-		$text .= LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_FOLLOW;
-		$text .= LAN_NOFOLLOW_INFO_MENU_GITHUB_BUTTONS_SCRIPT;
+		$template = e107::getTemplate('nofollow', 'project_info_menu');
+		$text = e107::getParser()->parseTemplate(
+			$template,
+			false,
+			[
+				'DEV_SUPPORT' => LAN_NOFOLLOW_INFO_MENU_SUPPORT_DEV_TEXT,
+				'SIGN' => LAN_NOFOLLOW_INFO_MENU_SUPPORT_DEV_TEXT_SIGN
+			]
+		);
 
-		return ['caption' => $caption, 'text' => $text];
-
+		return [
+			'caption' => LAN_NOFOLLOW_INFO_MENU_TITLE,
+			'text' => $text
+		];
 	}
 
 
@@ -175,6 +188,22 @@ class nofollow_ui extends e_admin_ui
 		$text = 'Nothing yet!';
 		$ns->tablerender(LAN_NOFOLLOW_HELP_PAGE_CAPTION, $text);
 
+	}
+
+
+	/**
+	 * Parses LAN constants to replace 'proprietary markdown characters'
+	 *  - with corresponding HTML tags
+	 * @param string $subject
+	 *  The string to be parsed.
+	 * @return mixed
+	 *  Parsed string.
+	 */
+	private function parseLAN($subject)
+	{
+		$search = ['(', ')', '[', ']', '{', '}', '+'];
+		$replace = ['<p>', '</p>', '<small>', '</small>', '<kbd>', '</kbd>', '<br>'];
+		return str_replace($search, $replace, $subject);
 	}
 
 

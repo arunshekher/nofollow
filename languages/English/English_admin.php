@@ -9,11 +9,11 @@ define('LAN_NOFOLLOW_PREF_VAL_CONTEXT_USER_ADMIN', 'User + Admin Posted');
 define('LAN_NOFOLLOW_PREF_VAL_CONTEXT_EVERYTHING', 'Everything');
 
 define('LAN_NOFOLLOW_ACTIVATE', 'Activate NoFollow?');
-define('LAN_NOFOLLOW_CONTEXT', '<p>NoFollow filtering context:</p><small>In what content context should NoFollow filter be applied.</small>');
-define('LAN_NOFOLLOW_GLOBAL_LIB', '<p>Use global path for simple dom parser lib</p><small>Turn this on if you wish to share Simple DOM parser library with other e107 plugins or themes.</small>');
-define('LAN_NOFOLLOW_EXCLUDE_PAGES', '<p>Exclude Pages: </p><small>Pages to exclude from nofollow filtering. Declare one page per line or separate with | sign. eg:</small><br><kbd> news.php<br> contact.php</kbd><br> OR <br><kbd>news.php|contact.php</kbd>');
-define('LAN_NOFOLLOW_EXCLUDE_DOMAINS', '<p>Exclude Domains: </p><small>Domain names to exclude from NoFollow filtering. One domain per line or use | sign to separate them. Your own domain name is excluded without declaring. eg:</small><br><kbd>myaffiliate.com<br>friend.site</kbd><br> OR <br><kbd>myaffiliate.com|friend.site</kbd>');
-define('LAN_NOFOLLOW_PARSE_METHOD_TO_USE', '<p>Parse Method to use: </p><small>RegEx method has slight temporal advantage in benchmarks and profiling.</small>');
+define('LAN_NOFOLLOW_CONTEXT', '(NoFollow filtering context:)[In what content context should NoFollow filter be applied.])');
+define('LAN_NOFOLLOW_GLOBAL_LIB', '(Use global path for simple dom parser lib)[Turn this on if you wish to share Simple DOM parser library with other e107 plugins or themes.]');
+define('LAN_NOFOLLOW_EXCLUDE_PAGES', '( Exclude Pages: )[ Pages to exclude from nofollow filtering. Declare one page per line or separate with | sign. eg: ] + { news.php + contact.php} + OR + { news.php|contact.php }');
+define('LAN_NOFOLLOW_EXCLUDE_DOMAINS', '( Exclude Domains: ) [Domain names to exclude from NoFollow filtering. One domain per line or use | sign to separate them. Your own domain name is excluded without declaring. eg: ] + { myaffiliate.com + friend.site } + OR + { myaffiliate.com|friend.site }');
+define('LAN_NOFOLLOW_PARSE_METHOD', '(Parse Method to use: )[RegEx method has slight temporal advantage in benchmarks and profiling.]');
 
 define('LAN_NOFOLLOW_HINT_EXCLUDE_PAGES', 'List of site pages that you want to exclude from Nofollow parse filter.');
 define('LAN_NOFOLLOW_HINT_EXCLUDE_DOMAINS', 'List of domains that you want to exclude from Nofollow parse filter.');
@@ -24,16 +24,12 @@ define('LAN_NOFOLLOW_HINT_CONTEXT', 'In what context NoFollow parse filter is ca
 define('LAN_NOFOLLOW_HINT_GLOBAL_LIB', 'Use global path for lib');
 
 define('LAN_NOFOLLOW_INFO_MENU_TITLE', 'Project Info');
-define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_GITHUB', '<br><h5>Project repo on GitHub:</h5>');
-define('LAN_NOFOLLOW_INFO_MENU_LOGO', '<div style="text-align: center"><img src="http://www.e107.space/projects/nofollow/svg" alt="Nofollow" width="128" height="128"></div>');
-define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_DEV', '<h5>Developer:</h5>');
-define('LAN_NOFOLLOW_INFO_MENU_DEV', '<p><small>Arun S. Sekher</small></p>');
-define('LAN_NOFOLLOW_INFO_MENU_GITHUB_BUTTONS_SCRIPT', '<script async defer src="https://buttons.github.io/buttons.js"></script>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_FOLLOW', '<a class="github-button" href="https://github.com/arunshekher" aria-label="Follow @arunshekher on GitHub">Follow</a>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_URL', '<p><kbd style="word-wrap: break-word"><a href="http://github.com/arunshekher/nofollow" target="_blank">http://github.com/arunshekher/nofollow</a></kbd></p>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_WATCH', '<a class="github-button" href="https://github.com/arunshekher/nofollow/subscription" data-icon="octicon-eye" aria-label="Watch arunshekher/nofollow on GitHub">Watch</a>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_STAR', ' <a class="github-button" href="https://github.com/arunshekher/nofollow" data-icon="octicon-star" aria-label="Star arunshekher/nofollow on GitHub">Star</a>');
-define('LAN_NOFOLLOW_INFO_MENU_REPO_BUTTON_ISSUE', ' <a class="github-button" href="https://github.com/arunshekher/nofollow/issues" data-icon="octicon-issue-opened" aria-label="Issue arunshekher/nofollow on GitHub">Issue</a>');
+define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_GITHUB', 'Project on GitHub');
+define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_ISSUES', 'Report Issues:');
+define('LAN_NOFOLLOW_INFO_MENU_SUBTITLE_DEV', 'Thank the Developer!');
+define('LAN_NOFOLLOW_INFO_MENU_DEV', 'Arun S. Sekher');
+define('LAN_NOFOLLOW_INFO_MENU_SUPPORT_DEV_TEXT', 'If you enjoy this plugin, please consider supporting what I do.');
+define('LAN_NOFOLLOW_INFO_MENU_SUPPORT_DEV_TEXT_SIGN', '"Thank you" &mdash; Arun');
 
 define('LAN_NOFOLLOW_HELP_PAGE_CAPTION', 'Help');
 

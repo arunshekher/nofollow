@@ -36,13 +36,13 @@ class nofollow_parse extends NoFollow
 	public function toHtml($text, $context = '')
 	{
 		if (
-			self::$Active &&
-			! self::isAdminArea() &&
-			! self::isExcludePage() &&
-			self::isInContext($context)
+			$this->Active &&
+			! $this->isAdminArea() &&
+			! $this->isExcludePage() &&
+			$this->isInContext($context)
 		) {
 
-			$method = self::$parseMethod;
+			$method = $this->parseMethod;
 
 			if (method_exists($this, $method)) {
 
