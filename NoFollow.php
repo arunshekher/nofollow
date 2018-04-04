@@ -290,7 +290,8 @@ abstract class NoFollow
 	 *
 	 * @return bool
 	 *  'True' if it is a valid destination URL
-	 * @todo: revise pattern
+	 * @fixme: original pattern was missing subdomains if it had only 2 chars
+	 *  - new one seems to circumvent that but need testing
 	 */
 	protected function isValidExternalUrl($input)
 	{
@@ -298,8 +299,9 @@ abstract class NoFollow
 		    . '[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.'
 			. '[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.'
 			. '[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})';
+		$pattern2 = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
 
-		if (preg_match($pattern, trim($input))) {
+		if (preg_match($pattern2, trim($input))) {
 			return true;
 		}
 
@@ -411,7 +413,6 @@ abstract class NoFollow
 	/**
 	 * Checks if currently parsing page matches an exclude page
 	 *
-	 * @todo do an if empty check for excludePages pref
 	 * @return boolean
 	 *  'True' if yes 'false' if no
 	 */
