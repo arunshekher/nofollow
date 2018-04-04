@@ -166,7 +166,14 @@ class nofollow_ui extends e_admin_ui
 	public function renderHelp()
 	{
 		$template = e107::getTemplate('nofollow', 'project_info_menu');
-		$text = e107::getParser()->parseTemplate($template['content'], false);
+		$text = e107::getParser()->parseTemplate(
+			$template,
+			false,
+			[
+				'DEV_SUPPORT' => LAN_NOFOLLOW_INFO_MENU_SUPPORT_DEV_TEXT,
+				'SIGN' => LAN_NOFOLLOW_INFO_MENU_SUPPORT_DEV_TEXT_SIGN
+			]
+		);
 
 		return [
 			'caption' => LAN_NOFOLLOW_INFO_MENU_TITLE,
@@ -185,12 +192,12 @@ class nofollow_ui extends e_admin_ui
 
 
 	/**
-	 * Parse LAN constants to replace 'proprietary markup characters'
+	 * Parses LAN constants to replace 'proprietary markdown characters'
 	 *  - with corresponding HTML tags
 	 * @param string $subject
 	 *  The string to be parsed.
 	 * @return mixed
-	 *  The amended string.
+	 *  Parsed string.
 	 */
 	private function parseLAN($subject)
 	{
