@@ -14,7 +14,7 @@ if (deftrue('BOOTSTRAP') && deftrue('FONTAWESOME')) {
 
 $PROJECT_INFO_MENU_TEMPLATE = '
 <div style="text-align: center">
-<img src="https://www.e107.space/projects/nofollow/svg" alt="Mentions" width="128" height="128">
+<img src="https://www.e107.space/projects/nofollow/svg" alt="Nofollow" width="128" height="128">
 </div>
 <ul class="list-unstyled">
 	<li>
