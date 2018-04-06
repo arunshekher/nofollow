@@ -1,4 +1,4 @@
-g[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0) [![Join the chat at https://gitter.im/nofollow-e107-plugin/Lobby](https://badges.gitter.im/nofollow-e107-plugin/Lobby.svg)](https://gitter.im/nofollow-e107-plugin/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0) [![Join the chat at https://gitter.im/nofollow-e107-plugin/Lobby](https://badges.gitter.im/nofollow-e107-plugin/Lobby.svg)](https://gitter.im/nofollow-e107-plugin/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # nofollow
 An SEO oriented e107 plugin that helps control the rel=nofollow attribute on user posted hyperlinks.
