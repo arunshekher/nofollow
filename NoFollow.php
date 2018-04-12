@@ -291,7 +291,7 @@ abstract class NoFollow
 	 * @return bool
 	 *  'True' if it is a valid destination URL
 	 * @fixme: original pattern was missing subdomains if it had only 2 chars
-	 *  - new one seems to circumvent that but need testing
+	 *  - new one seems to circumvent that but need thorough testing
 	 */
 	protected function isValidExternalUrl($input)
 	{

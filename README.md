@@ -4,7 +4,7 @@
 An SEO oriented e107 plugin that helps control the rel=nofollow attribute on user posted hyperlinks.
 
 # Description
-This plugin is aimed to put off back-link building SPAM posts in e107 powered websites. Simply put, it inserts rel='nofollow' attribute to user posted hyperlinks. But its behavior is dependent on many variables which can be controlled by means plugin options.
+This plugin is aimed to put off back-link building SPAM posts in e107 powered websites. Simply put, it inserts rel='nofollow' attribute to user posted untrusted hyperlinks. But its behavior is dependent on many variables which can be controlled by means of plugin options.
 
 Hyperlinks with an rel='nofollow' attribute generate no positive benefits as to search engine algorithmic perspective for the poster and such hyperlink target URLs are mostly dropped out of search engine link graph.
 
