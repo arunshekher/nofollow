@@ -327,14 +327,18 @@ abstract class NoFollow
 			return $anchor;
 		}
 
-		if (strpos($anchor, 'rel')) {
-			$pattern = "/rel=([\"'])([^\\1]+?)\\1/";
-			$replace = 'rel=\\1nofollow \\2\\1 target="_blank"';
+		if (strpos($anchor, 'rel=')) {
 
-			return preg_replace($pattern, $replace, $anchor);
+			//$pattern = "/rel=([\"'])([^\1]+?)\1/";
+			$pattern2 = '/rel=([\'"])(.*?)\1/';
+
+			//$replace = 'rel=\1nofollow \2\1 target="_blank"';
+			$replace2 = 'rel=\1\2 nofollow noopener noreferrer\1 target="_blank"';
+
+			return preg_replace($pattern2, $replace2, $anchor);
 		}
 		$pattern = '/<a /';
-		$replace = '<a rel="nofollow" target="_blank"';
+		$replace = '<a rel="nofollow noopener noreferrer" target="_blank"';
 
 		return preg_replace($pattern, $replace, $anchor);
 	}
@@ -370,10 +374,10 @@ abstract class NoFollow
 						'nofollow') === false) && strpos((string)$anchor->rel,
 					'external') !== false
 			) {
-				$anchor->rel = 'nofollow external';
+				$anchor->rel = 'nofollow external noopener noreferrer';
 				$anchor->target = '_blank';
 			} else {
-				$anchor->rel = 'nofollow';
+				$anchor->rel = 'nofollow noopener noreferrer';
 				$anchor->target = '_blank';
 			}
 		}
@@ -516,7 +520,7 @@ abstract class NoFollow
 	 */
 	private static function d($content, $logname = 'Nofollow-Debug')
 	{
-		$path = e_PLUGIN . 'nofollow/' . $logname . '.log';
+		$path = e_PLUGIN . 'nofollow/' . $logname . '.txt';
 		if (is_array($content)) {
 			$content = var_export($content, true);
 		}
